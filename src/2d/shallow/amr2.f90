@@ -147,6 +147,7 @@ program amr2
     read(inunit,*) nvar    ! meqn
     read(inunit,*) mwaves
     read(inunit,*) naux
+    ! QUESTION: what is aux?
     read(inunit,*) t0
 
     ! ==========================================================================
@@ -318,6 +319,7 @@ program amr2
         stop 'Error ***   mxnest > max. allowable levels (maxlv) in common'
     endif
       
+    !QUESTION: why can length of the refinement ratio array be larger than mxnest-1
     ! Anisotropic refinement always allowed in 5.x:
     read(inunit,*) (intratx(i),i=1,max(1,mxnest-1))
     read(inunit,*) (intraty(i),i=1,max(1,mxnest-1))
@@ -371,6 +373,7 @@ program amr2
     call set_gauges('gauges.data')
 
     ! New fixed grid routines to keep track of max over computation:
+    ! QUESTION: what does this subroutine do
     call set_fgmax('fgmax.data')
 
     ! Look for capacity function via auxtypes:

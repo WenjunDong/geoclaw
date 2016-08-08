@@ -17,6 +17,15 @@ c
        dimension aux(maux,mitot,mjtot)
        dimension auxc1d(maux,lenbc)
 
+       !If the grid, mptr, is of level L, 
+       !qc1d stores values for cells on level L-1 that are adjacent to
+       !the border of grid mptr and won't be modified here.
+       !valbig stores values of cells of grid mptr.
+       !ql will store values of ghost cells along each side of grid mptr
+       !respectively
+       !qr will store values of coarse cells on level L-1 that overlap
+       !with cells in ql accordingly
+       !svdflx stores the fluctuation, amdq+apdq between ql and qr 
 c
 c ::::::::::::::::::::::::::: QAD ::::::::::::::::::::::::::::::::::
 c  solve RP between ghost cell value on fine grid and coarse grid
@@ -138,6 +147,9 @@ c                # from the cell corresponding  to q
 c
 c we have the wave. for side 1 add into sdflxm
 c
+       ! one coarse cell on level L-1 shares edge with lratioy fine
+       ! cells on level L. So the fluctuation from solving these 
+       ! lratioy riemann problems will all be added to the coarse cell
        influx = 0
        do 30 j = 1, nc/lratioy
           influx  = influx + 1

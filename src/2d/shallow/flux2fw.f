@@ -154,6 +154,7 @@ c   # Set fadd for the donor-cell upwind method (Godunov)
             dxdc=1.d0
          endif
 
+          ! QUESTION: what's the meaning of faddp and faddm here?
           do m=1,meqn
             faddp(m,i) = faddp(m,i) - apdq(m,i)
             faddm(m,i) = faddm(m,i) + amdq(m,i)
@@ -215,7 +216,7 @@ c         # incorporate cqxx into amdq and apdq so that it is split also.
                 amdq(m,i) = amdq(m,i) + cqxx(m,i)
                 apdq(m,i) = apdq(m,i) - cqxx(m,i)
   150           continue
-          endif
+       endif
 c
 c
 c      # modify G fluxes for transverse propagation
@@ -223,6 +224,7 @@ c      --------------------------------------------
 c
 c
 c     # split the left-going flux difference into down-going and up-going:
+      ! return bmasdq and bpasdq that should be added to G_{i-1/2}^tilde
       call rpt2(ixy,1,maxm,meqn,mwaves,maux,mbc,mx,
      &          q1d,q1d,aux1,aux2,aux3,
      &          amdq,bmasdq,bpasdq)

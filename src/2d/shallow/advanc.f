@@ -69,6 +69,7 @@ c
       timeBound = timeBound + clock_finishBound - clock_start  
 
 c
+      !QUESTION: what does this saveeqc do? why pass in level+1?
 c save coarse level values if there is a finer level for wave fixup
       if (level+1 .le. mxnest) then
          if (lstart(level+1) .ne. null) then
@@ -193,6 +194,7 @@ c
              ntot   = mitot * mjtot * nvar
 cdir$ ivdep
              do 10 i = 1, ntot
+               !keep old solution here starting from alloc(locold+i-1)
  10            alloc(locold + i - 1) = alloc(locnew + i - 1)
           endif
 c
@@ -208,7 +210,16 @@ c
       locaux = node(storeaux,mptr)
 c
       if (node(ffluxptr,mptr) .ne. 0) then
+         ! lenbc is number of cells on level-1 that are adjacent to the border of this grid
          lenbc  = 2*(nx/intratx(level-1)+ny/intraty(level-1))
+         ! alloc(locsvq) is the beginning of the memory space that
+         ! stores values of coarse cells on level-1 that are adjacent to
+         ! the border of this grid mptr (along 4 edges of grid mptr).
+         ! alloc(locx1d) stores auxilary array for the same cells above.
+         ! alloc(locsvf) stores conservation fix-up that should be
+         ! applied to alloc(locsvq)
+         ! node(ffluxptr, mptr) is the node saving the location of this
+         ! block of memory that stores the conservation fix-up
          locsvf = node(ffluxptr,mptr)
          locsvq = locsvf + nvar*lenbc
          locx1d = locsvq + nvar*lenbc

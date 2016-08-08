@@ -21,6 +21,8 @@ subroutine step2(maxm,meqn,maux,mbc,mx,my, &
 !     The only modification is the 101 loop
 !------------last modified 12/30/04--------------------------
 !
+! qold is not changed here
+! return fm, fp, gm, gp
 
     use geoclaw_module, only: dry_tolerance
     use amr_module, only: mwaves, mcapa

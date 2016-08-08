@@ -35,8 +35,8 @@ c ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 c
  
       do 10 j=1,mjtot
-      do 10 i=1,mitot
-         iused(i,j) = 0.
+          do 10 i=1,mitot
+             iused(i,j) = 0.
  10   continue
  
       locaux = node(storeaux,mptr)
@@ -46,6 +46,9 @@ c
 
       if (uprint) write(outunit,*)" upbnding grid ",mptr
 
+      ! QUESTION: loop over each fine grid (on level "level")?
+      ! It seems like this is looping over each cell that needs to be
+      ! corrected.
       do 40 ispot = 1,maxsp
          icrse = listbc(1,ispot)
          if (icrse.eq.0) go to 99

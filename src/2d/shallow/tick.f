@@ -16,6 +16,7 @@ c
       dimension dtnew(maxlv), ntogo(maxlv), tlevel(maxlv)
       integer clock_start, clock_finish, clock_rate
 
+
 c
 c :::::::::::::::::::::::::::: TICK :::::::::::::::::::::::::::::
 c  main driver routine.  controls:
@@ -34,7 +35,7 @@ c  integration strategy is to advance a fine grid until it catches
 c  up to the coarse grid. this strategy is applied recursively.
 c  coarse grid goes first.
 c
-c  nsteps: used to count how number steps left for a level to be
+c  nsteps: used to count how many steps left for a level to be
 c          integrated before it catches up with the next coarser level.
 c  ncycle: counts number of coarse grid steps = # cycles.
 c
@@ -117,6 +118,7 @@ c        write(*,*)" old possk is ", possk(1)
          diffdt = oldposs - possk(1)  ! if positive new step is smaller
 
 
+         !QUESTION: why the condition is always false?
          if (.false.) then  
             write(*,122) diffdt,outtime  ! notify of change
  122        format(" Adjusting timestep by ",e10.3,
@@ -127,8 +129,8 @@ c           write(*,*)" new possk is ", possk(1)
               write(*,123) pctIncrease
  123          format(" New step is ",e8.2," % larger.",
      .               "  Should still be stable")
-              endif
             endif
+         endif
 
 
          do i = 2, mxnest
@@ -159,19 +161,20 @@ c
          dtnew(i)  = rinfinity
       enddo
 
+      !QUESTION: What does this mean?
 c     We should take at least one step on all levels after any
 c     moving topography (dtopo) has been finalized to insure that
 c     all aux arrays are consistent with the final topography.
 c     The variable aux_finalized is incremented so that we can check
 c     if this is true by checking if aux_finalized == 2 elsewhere in code.
 
-	  if (aux_finalized .eq. 1) then
-c         # this is only true once, and only if there was moving topo
-          deallocate(topo0work)
-          endif 
+      if (aux_finalized .eq. 1) then
+c     # this is only true once, and only if there was moving topo
+      deallocate(topo0work)
+      endif 
       if (topo_finalized .and. (aux_finalized .lt. 2)) then
           aux_finalized = aux_finalized + 1
-          endif
+      endif
 
     
 c
@@ -185,19 +188,22 @@ c        this only affects two grid levels higher, occurs because
 c        previous time step needs boundary vals for giant step.
 c  no error estimation on finest possible grid level
 c
+
  60       continue
           if (icheck(level) .ge. kcheck) then
                lbase = level
+! If next 1 or 2 finer levels have been advanced for enought time steps,
+! regrid base on them unless they are the finest level.
           else if (level+1 .ge. mxnest) then
-               go to 90
+              go to 90 ! done regridding
           else if (icheck(level+1) .ge. kcheck) then
                lbase = level+1
           else if (level+2 .ge. mxnest) then
-               go to 90
+               go to 90 ! done regridding
           else if (icheck(level+2) .ge. kcheck) then
                lbase = level+2
           else
-               go to 90
+               go to 90 ! done regridding
           endif
           if (lbase .eq. mxnest .or. lbase .gt. lfine) go to 70
 c
@@ -210,9 +216,11 @@ c
           call system_clock(clock_start,clock_rate)
           call regrid(nvar,lbase,cut,naux,start_time)
           call system_clock(clock_finish,clock_rate)
+          !QUESTION: This variable was not initialized?
           timeRegridding = timeRegridding + clock_finish - clock_start
 
           call setbestsrc()     ! need at every grid change
+
 c         call conck(1,nvar,naux,time,rest)
 c         call outtre(lstart(lbase+1),.true.,nvar,naux)
 c note negative time to signal regridding output in plots
@@ -238,7 +246,7 @@ c          MJB: modified to check level where new grids start, which is lbase+1
      &                 '  in y:',i3,'  in t:',i3,' for level ',i4)
                  end do
 
-              endif
+          endif
 
 c  ------- done regridding --------------------
 c
@@ -283,14 +291,14 @@ c            #  check if should adjust finer grid time step to start wtih
               else
                 ntogo(level) = kratio(level-1)
               endif
-             possk(level) = possk(level-1)/ntogo(level)
-             go to 60
+              possk(level) = possk(level-1)/ntogo(level)
+              go to 60
           endif
 c
  105      if (level .eq. 1) go to 110
-              if (ntogo(level) .gt. 0) then
-c                same level goes again. check for ok time step
- 106             if ((possk(level)-dtnew(level))/dtnew(level)
+          if (ntogo(level) .gt. 0) then
+c             same level goes again. check for ok time step
+ 106          if ((possk(level)-dtnew(level))/dtnew(level)
      .                .gt. .05)  then
 
                     write(6,601) level, time
@@ -309,26 +317,27 @@ c                   adjust time steps for this and finer levels
                     print *,"    new ntogo dt ",ntogo(level),
      &                      possk(level)
                     go to 106
-                 endif
-                 if (ntogo(level) .gt. 100) then
-                     write(6,*) "**** Too many dt reductions ****"
-                     write(6,*) "**** Stopping calculation   ****"
-                     write(6,*) "**** ntogo = ",ntogo(level)
-                     write(6,1006) intratx(level-1),intraty(level-1),
-     &                             kratio(level-1),level
-                     write(6,*) "Writing checkpoint file at t = ",time
-                     call check(ncycle,time,nvar,naux)
-                     stop
-                 endif
-
-                 go to 60
-              else
-                 level = level - 1
-                 call system_clock(clock_start,clock_rate)
-                 call update(level,nvar,naux)
-                 call system_clock(clock_finish,clock_rate)
-                 timeUpdating=timeUpdating+clock_finish-clock_start
               endif
+              if (ntogo(level) .gt. 100) then
+                  write(6,*) "**** Too many dt reductions ****"
+                  write(6,*) "**** Stopping calculation   ****"
+                  write(6,*) "**** ntogo = ",ntogo(level)
+                  write(6,1006) intratx(level-1),intraty(level-1),
+     &                          kratio(level-1),level
+                  write(6,*) "Writing checkpoint file at t = ",time
+                  call check(ncycle,time,nvar,naux)
+                  stop
+              endif
+
+              go to 60
+          else
+             level = level - 1
+             call system_clock(clock_start,clock_rate)
+             ! update grids at level 'level' by averaging from 1 level finer mesh
+             call update(level,nvar,naux) 
+             call system_clock(clock_finish,clock_rate)
+             timeUpdating=timeUpdating+clock_finish-clock_start
+          endif
           go to 105
 c
 c  --------------one complete coarse grid integration cycle done. -----
@@ -424,4 +433,4 @@ c
 
       write(6,*) "Done integrating to time ",time
       return
-      end
+  

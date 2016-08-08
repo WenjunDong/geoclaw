@@ -58,7 +58,19 @@ c 20   if (mptr .eq. 0) go to 85
 !$OMP&                   nghost,uprint,nvar,naux,mcapa,node,listsp,
 !$OMP&                   alloc,lstart,dry_tolerance),
 !$OMP&            DEFAULT(none)
+
+      !loop over each grids on level "level"
       do ng = 1, numgrids(lget)
+         ! These variables are:
+         ! mptr: a pointer to one grid of all grids on level "level"
+         ! nx: number of cells in x direction for this grid
+         ! ny: number of cells in y direction for this grid
+         ! mitot: number of cells in x direction for this grid, including ghost cells.
+         ! mjtot: number of cells in y direction for this grid, including ghost cells.
+         ! ilo: index of left-most cell
+         ! jlo: index of lower-most cell
+         ! ihi: index of upper-most cell
+         ! jhi: index of right-most cell
 c        mptr    = mget(ng, level)
          mptr    = listgrids(ng)
          loc     = node(store1,mptr)
@@ -74,6 +86,7 @@ c        mptr    = mget(ng, level)
 c
          if (node(cfluxptr,mptr) .eq. 0) go to 25
 c         locuse = igetsp(mitot*mjtot)
+         !QUESTION: what is listsp()?
          call upbnd(alloc(node(cfluxptr,mptr)),alloc(loc),nvar,naux,
      1              mitot,mjtot,listsp(lget),mptr) ! took out next to last arg
 c     1              mitot,mjtot,listsp(lget),alloc(locuse),mptr)
@@ -101,6 +114,7 @@ c
          jphi = min(jhi,jchi)
 
          if (iplo .gt. iphi .or. jplo .gt. jphi) go to 75
+!QUESTION: what is iff and jff?
 c
 c  calculate starting index for fine grid source pts.
 c
@@ -108,15 +122,17 @@ c
          jff    = jplo*intraty(lget) - node(ndjlo,mkid) + nghost + 1
          totrat = intratx(lget) * intraty(lget)
 
+         ! i and j are index of the coarse cell (on level "level"), which will get averaged
+         ! value from fine grids (level "level+1")
          do 71 i = iplo-ilo+nghost+1, iphi-ilo+nghost+1
-         do 70 j = jplo-jlo+nghost+1, jphi-jlo+nghost+1
-           if (uprint) then
-              write(outunit,101) i,j,mptr,iff,jff,mkid
- 101          format(' updating pt. ',2i4,' of grid ',i3,' using ',2i4,
-     1               ' of grid ',i4)
-              write(outunit,102)(alloc(iadd(ivar,i,j)),ivar=1,nvar)
- 102          format(' old vals: ',4e25.15)
-           endif
+            do 70 j = jplo-jlo+nghost+1, jphi-jlo+nghost+1
+               if (uprint) then
+                  write(outunit,101) i,j,mptr,iff,jff,mkid
+ 101              format(' updating pt. ',2i4,' of grid ',i3,' using ',2i4,
+     1                   ' of grid ',i4)
+                  write(outunit,102)(alloc(iadd(ivar,i,j)),ivar=1,nvar)
+ 102              format(' old vals: ',4e25.15)
+               endif
 c
 c
 c  update using intrat fine points in each direction
@@ -134,76 +150,81 @@ c     note: this conserves mass and momentum as long as all fine cells are wet.
 c     Momentum is reduced by the same factor as mass in the coarse cell
 c     and is never increased given an increase in mass
 
-      if (mcapa .eq. 0) then
-         capac=1.0d0
-      else
-         capac=alloc(iaddcaux(i,j))
-         endif
+               if (mcapa .eq. 0) then
+                  capac=1.0d0
+               else
+                  capac=alloc(iaddcaux(i,j))
+                  endif
 
-      bc = alloc(iaddctopo(i,j))
+               bc = alloc(iaddctopo(i,j))
 
-      etasum = 0.d0
-      hsum = 0.d0
-      husum = 0.d0
-      hvsum = 0.d0
+               etasum = 0.d0
+               hsum = 0.d0
+               husum = 0.d0
+               hvsum = 0.d0
 
-      nwet=0
+               nwet=0
 
-      do jco  = 1, intraty(lget)
-         do ico  = 1, intratx(lget)
-            if (mcapa .eq. 0) then
-               capa=1.0d0
-            else
-               capa=alloc(iaddfaux(iff+ico-1,jff+jco-1))
-            endif
+               ! sum up solution q of all fine cells in this coarse cell?
+               do jco  = 1, intraty(lget)
+                  do ico  = 1, intratx(lget)
+                     if (mcapa .eq. 0) then
+                        capa=1.0d0
+                     else
+                        capa=alloc(iaddfaux(iff+ico-1,jff+jco-1))
+                     endif
 
-            hf = alloc(iaddf(1,iff+ico-1,jff+jco-1))*capa 
-            bf = alloc(iaddftopo(iff+ico-1,jff+jco-1))*capa
-            huf= alloc(iaddf(2,iff+ico-1,jff+jco-1))*capa 
-            hvf= alloc(iaddf(3,iff+ico-1,jff+jco-1))*capa 
+                     hf = alloc(iaddf(1,iff+ico-1,jff+jco-1))*capa 
+                     bf = alloc(iaddftopo(iff+ico-1,jff+jco-1))*capa
+                     huf= alloc(iaddf(2,iff+ico-1,jff+jco-1))*capa 
+                     hvf= alloc(iaddf(3,iff+ico-1,jff+jco-1))*capa 
 
-            if (hf > dry_tolerance) then
-               etaf = hf+bf
-               nwet=nwet+1
-            else
-               etaf = 0.d0
-               huf=0.d0
-               hvf=0.d0
-               endif
+                     if (hf > dry_tolerance) then
+                        etaf = hf+bf
+                        nwet=nwet+1
+                     else
+                        etaf = 0.d0
+                        huf=0.d0
+                        hvf=0.d0
+                        endif
 
-               hsum   = hsum + hf
-               husum  = husum + huf
-               hvsum  = hvsum + hvf
-               etasum = etasum + etaf
-            enddo
-         enddo
+                        hsum   = hsum + hf
+                        husum  = husum + huf
+                        hvsum  = hvsum + hvf
+                        etasum = etasum + etaf
+                  enddo
+               enddo
 
-      if (nwet.gt.0) then
-         etaav=etasum/dble(nwet)
-         hav= hsum/dble(nwet)
-*         hc=max(etaav-bc*capac,0.d0) !tsunamiclaw method
-         hc=min(hav,(max(etaav-bc*capac,0.d0)))
-         huc=(min(hav,hc)/hsum)*husum
-         hvc=(min(hav,hc)/hsum)*hvsum
-      else
-         hc=0.d0
-         huc=0.d0
-         hvc=0.d0
-         endif
+               if (nwet.gt.0) then
+                  etaav=etasum/dble(nwet)
+                  hav= hsum/dble(nwet)
+*                  hc=max(etaav-bc*capac,0.d0) !tsunamiclaw method
+                  hc=min(hav,(max(etaav-bc*capac,0.d0)))
+                  huc=(min(hav,hc)/hsum)*husum
+                  hvc=(min(hav,hc)/hsum)*hvsum
+               else
+                  hc=0.d0
+                  huc=0.d0
+                  hvc=0.d0
+                  endif
 
-c     # set h on coarse grid based on surface, not conservative near shoreline
-      alloc(iadd(1,i,j)) = hc / capac 
-      alloc(iadd(2,i,j)) = huc / capac 
-      alloc(iadd(3,i,j)) = hvc / capac 
+c              # set h on coarse grid based on surface, not conservative near shoreline
+               ! write new value of h, hu, hv on level "level" grid. 
+               ! This is just averaged from finer cells. 
+               ! Conservation fix-up have been done earlier by calling
+               ! upbnd()
+               alloc(iadd(1,i,j)) = hc / capac 
+               alloc(iadd(2,i,j)) = huc / capac 
+               alloc(iadd(3,i,j)) = hvc / capac 
 c
-      if (uprint) write(outunit,103)(alloc(iadd(ivar,i,j)),
-     .     ivar=1,nvar)
- 103  format(' new vals: ',4e25.15)
+               if (uprint) write(outunit,103)(alloc(iadd(ivar,i,j)),
+     .              ivar=1,nvar)
+ 103           format(' new vals: ',4e25.15)
 c
-      jff = jff + intraty(lget)
- 70   continue
-      iff = iff + intratx(lget)
-      jff    = jplo*intraty(lget) - node(ndjlo,mkid) + nghost + 1
+               jff = jff + intraty(lget)
+ 70         continue
+            iff = iff + intratx(lget)
+            jff    = jplo*intraty(lget) - node(ndjlo,mkid) + nghost + 1
  71   continue
 c
  75   mkid = node(levelptr,mkid)
