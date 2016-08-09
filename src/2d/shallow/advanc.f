@@ -6,6 +6,7 @@ c
       use amr_module
       use fixedgrids_module
       use topo_module, only: topo_finalized
+      use sediment_module, only: nyc,nxc,ngc
 
       implicit double precision (a-h,o-z)
 
@@ -50,10 +51,14 @@ c We want to do this regardless of the threading type
 !$OMP&                   nghost,node,rnode,numgrids,listgrids),
 !$OMP&            SCHEDULE (dynamic,1)
 !$OMP&            DEFAULT(none)
+      !print *, node
       do  j = 1, numgrids(level)
           mptr = listgrids(j)
+          !print *, numgrids(level)
+          !print *, level
           nx     = node(ndihi,mptr) - node(ndilo,mptr) + 1
           ny     = node(ndjhi,mptr) - node(ndjlo,mptr) + 1
+          !print *, nx,ny
           mitot  = nx + 2*nghost
           mjtot  = ny + 2*nghost
           locnew = node(store1,mptr)
@@ -104,6 +109,8 @@ c   ! $OMP PARALLEL DO num_threads(nt)
           mptr = listgrids(j)
           nx     = node(ndihi,mptr) - node(ndilo,mptr) + 1
           ny     = node(ndjhi,mptr) - node(ndjlo,mptr) + 1
+          !nxc = nx
+          !nyc = ny
           mitot  = nx + 2*nghost
           mjtot  = ny + 2*nghost
 c
