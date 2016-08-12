@@ -127,11 +127,11 @@ c
          do 71 i = iplo-ilo+nghost+1, iphi-ilo+nghost+1
             do 70 j = jplo-jlo+nghost+1, jphi-jlo+nghost+1
                if (uprint) then
-                  write(outunit,101) i,j,mptr,iff,jff,mkid
- 101              format(' updating pt. ',2i4,' of grid ',i3,' using ',2i4,
-     1                   ' of grid ',i4)
-                  write(outunit,102)(alloc(iadd(ivar,i,j)),ivar=1,nvar)
- 102              format(' old vals: ',4e25.15)
+               write(outunit,101) i,j,mptr,iff,jff,mkid
+ 101           format(' updating pt. ',2i4,' of grid ',i3,' using ',2i4,
+     1                ' of grid ',i4)
+               write(outunit,102)(alloc(iadd(ivar,i,j)),ivar=1,nvar)
+ 102           format(' old vals: ',4e25.15)
                endif
 c
 c

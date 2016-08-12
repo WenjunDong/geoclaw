@@ -46,9 +46,11 @@ c
 
       if (uprint) write(outunit,*)" upbnding grid ",mptr
 
-      ! QUESTION: loop over each fine grid (on level "level")?
-      ! It seems like this is looping over each cell that needs to be
-      ! corrected.
+      ! loop over each segment of the border of all fine grids on level
+      ! "level+1"
+      ! length of each segment is equal to dx=dy of grid mptr (namely level
+      ! "level")
+      ! maxsp is number of those segments
       do 40 ispot = 1,maxsp
          icrse = listbc(1,ispot)
          if (icrse.eq.0) go to 99
