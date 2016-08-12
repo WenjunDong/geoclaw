@@ -132,8 +132,8 @@ c           write(*,*)" new possk is ", possk(1)
               write(*,123) pctIncrease
  123          format(" New step is ",e8.2," % larger.",
      .               "  Should still be stable")
-              endif
             endif
+         endif
 
 
          do i = 2, mxnest
@@ -169,14 +169,18 @@ c     moving topography (dtopo) has been finalized to insure that
 c     all aux arrays are consistent with the final topography.
 c     The variable aux_finalized is incremented so that we can check
 c     if this is true by checking if aux_finalized == 2 elsewhere in code.
+      ! aux_finalized == 2 implies that aux has been set from dtopo
 
-	  !if (aux_finalized .eq. 1) then
+      ! QUESTION: why this is commented out from v5.2.0
+      ! This should affect the result if dtopo is not used
+      ! in sediment transport 
+      !if (aux_finalized .eq. 1) then
 c         # this is only true once, and only if there was moving topo
-          !deallocate(topo0work)
-          !endif
+      !deallocate(topo0work)
+      !endif
       !if (topo_finalized .and. (aux_finalized .lt. 2)) then
           !aux_finalized = aux_finalized + 1
-    !endif
+      !endif
 
     
 c
@@ -243,7 +247,7 @@ c          MJB: modified to check level where new grids start, which is lbase+1
      &                 '  in y:',i3,'  in t:',i3,' for level ',i4)
                  end do
 
-              endif
+          endif
 
 c  ------- done regridding --------------------
 c
@@ -288,14 +292,14 @@ c            #  check if should adjust finer grid time step to start wtih
               else
                 ntogo(level) = kratio(level-1)
               endif
-             possk(level) = possk(level-1)/ntogo(level)
-             go to 60
+              possk(level) = possk(level-1)/ntogo(level)
+              go to 60
           endif
 c
  105      if (level .eq. 1) go to 110
-              if (ntogo(level) .gt. 0) then
-c                same level goes again. check for ok time step
- 106             if ((possk(level)-dtnew(level))/dtnew(level)
+          if (ntogo(level) .gt. 0) then
+c             same level goes again. check for ok time step
+ 106          if ((possk(level)-dtnew(level))/dtnew(level)
      .                .gt. .05)  then
 
 

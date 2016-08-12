@@ -167,6 +167,7 @@ c     moving topography (dtopo) has been finalized to insure that
 c     all aux arrays are consistent with the final topography.
 c     The variable aux_finalized is incremented so that we can check
 c     if this is true by checking if aux_finalized == 2 elsewhere in code.
+      ! aux_finalized == 2 implies that aux has been set from dtopo
 
       if (aux_finalized .eq. 1) then
 c     # this is only true once, and only if there was moving topo

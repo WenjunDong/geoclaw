@@ -206,8 +206,11 @@ contains
 
             ! Read topography and allocate space for each file
             mtoposize = sum(mtopo)
+            ! topowork stores topography data B(x,y) for all topo files
+            ! including dtopo
             allocate(topowork(mtoposize))
 
+            ! loop over static topo files, excluding dtopo
             do i=1,mtopofiles - num_dtopo
                 topoID(i) = i
                 topotime(i) = -huge(1.0)
