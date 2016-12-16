@@ -172,7 +172,7 @@ c     if this is true by checking if aux_finalized == 2 elsewhere in code.
       ! aux_finalized == 2 implies that aux has been set from dtopo
 
       ! QUESTION: why this is commented out from v5.2.0
-      ! This should affect the result if dtopo is not used
+      ! This should not affect the result if dtopo is not used
       ! in sediment transport 
       !if (aux_finalized .eq. 1) then
 c         # this is only true once, and only if there was moving topo

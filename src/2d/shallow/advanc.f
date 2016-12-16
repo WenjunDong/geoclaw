@@ -215,9 +215,14 @@ c
          ! alloc(locsvq) is the beginning of the memory space that
          ! stores values of coarse cells on level-1 that are adjacent to
          ! the border of this grid mptr (along 4 edges of grid mptr).
+         ! I wonder alloc(locsvq) stores coarse cells value on last time
+         ! step, namely q^0_j?
+         !
          ! alloc(locx1d) stores auxilary array for the same cells above.
+         !
          ! alloc(locsvf) stores conservation fix-up that should be
          ! applied to alloc(locsvq)
+         !
          ! node(ffluxptr, mptr) is the node saving the location of this
          ! block of memory that stores the conservation fix-up
          locsvf = node(ffluxptr,mptr)

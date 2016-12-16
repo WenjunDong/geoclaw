@@ -152,8 +152,7 @@ c               # test if arrival times should be output
 !$OMP END CRITICAL (FixedGrids)
 c::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-       ! This is called before each call to step
-       ! Do NOT have anything I should care about for now
+       ! This is called before each call to stepgrid
        call b4step2(mbc,mx,my,nvar,q,
      &             xlowmbc,ylowmbc,dx,dy,time,dt,maux,aux)
       

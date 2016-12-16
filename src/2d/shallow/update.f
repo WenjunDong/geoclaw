@@ -86,7 +86,6 @@ c        mptr    = mget(ng, level)
 c
          if (node(cfluxptr,mptr) .eq. 0) go to 25
 c         locuse = igetsp(mitot*mjtot)
-         !QUESTION: what is listsp()?
          call upbnd(alloc(node(cfluxptr,mptr)),alloc(loc),nvar,naux,
      1              mitot,mjtot,listsp(lget),mptr) ! took out next to last arg
 c     1              mitot,mjtot,listsp(lget),alloc(locuse),mptr)

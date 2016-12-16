@@ -914,6 +914,7 @@
                 write(SED_PARM_UNIT,*) '   Critical avalanching slope above water:',dryslp
                 write(SED_PARM_UNIT,*) '   toler for sediment flux limitor:',toler
                 write(SED_PARM_UNIT,*) '   Slope affect factor:',facsl
+                ! QUESTION: what does this mean?
                 write(SED_PARM_UNIT,*) '    use source-sink terms to calculate bed level change:',sourcesink
                 write(SED_PARM_UNIT,*) '    have avalanched or not:',aval
                 write(SED_PARM_UNIT,*) '    Include avalanching:',avalanching

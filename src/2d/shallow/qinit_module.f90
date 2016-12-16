@@ -86,6 +86,12 @@ contains
         
     end subroutine add_perturbation
 
+    ! This subroutine reads in initial data files specified in qinit.data,
+    ! and store it in a local private array, qinit
+    ! The array qinit is essentially point data so it needs to be integrated
+    ! to get cell data in add_perturbation()
+    ! add_perturbation then use the cell data from qinit to modify q
+    ! For now only ONE component of q can be specified in this way
     subroutine set_qinit(fname)
     
         use geoclaw_module, only: GEO_PARM_UNIT

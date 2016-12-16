@@ -1,10 +1,10 @@
 subroutine setprob()
 
-    use geoclaw_module !geoclaw_module.f90
-    use topo_module !topo_module.f90
-    use qinit_module !qinit_module.f90
-    use fixedgrids_module !fixedgrids_module.f90
-    use refinement_module !refinement_module.f90
+    use geoclaw_module
+    use topo_module
+    use qinit_module
+    use fixedgrids_module
+    use refinement_module
     use sediment_module !sediment_module.f90
 
     implicit none

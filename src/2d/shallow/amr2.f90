@@ -486,6 +486,8 @@ program amr2
         dxmin = hxposs(mxnest)
         dymin = hyposs(mxnest)
 
+        ! allocate initial coarse grid domain. Set node info & 
+        ! initialize grid. Also set up initial space and time step
         call domain(nvar,vtime,nx,ny,naux,t0)
 
         ! Hold off on gauges until grids are set. 

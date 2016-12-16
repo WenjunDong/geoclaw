@@ -12,6 +12,7 @@
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             subroutine bedrough(mbc,mx,my,u,v,h,z0)
 
+                ! This subroutine return bed roughness, z0
                 use sediment_module, only: hcr,D,g,m0,rhos,rho,gmax
                 use Set_Precision, only: Prec
 
@@ -94,6 +95,18 @@
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             ! This Part is used to calculate critical velocity for each grain size classes!
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            ! compute ub_cr, us_cr1, us_cr2
+            ! don't need ghost cell. These are all functions of 
+            ! concentration in local cell (i,j)
+            ! ub_cr, us_cr1 and us_cr2 define 4 ranges corresponding to:
+            !
+            ! (1) U < ub_cr: no sediment transport
+            ! (2) ub_cr < U < us_cr1: only bed load
+            ! (3) us_cr1 < U < us_cr2: mixed bed load and suspended load
+            ! (4) us_cr2 < U : all suspended load
+            !
+            ! This is equivalent to using Rouse number 
+            ! to determine sediment movement condition
             subroutine crtical_velocity1(mbc,mx,my,h,u,v,ub_cr,us_cr1,us_cr2)!,u,v)
 
                 use sediment_module, only: rhos,rho,gmax,g,D,hcr,k0,m0,pbbed
@@ -213,6 +226,7 @@
             ! This Part is used to calculate settling velocity for each grain size classes!
             !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+            ! don't need ghost cell. These are all functions of concentration in local
             subroutine settling_velocity(mbc,mx,my,ws)
 
                 use sediment_module, only: rhos,rho,gmax,g,D
@@ -228,6 +242,7 @@
                 !local
                 integer :: i,j,k
                 Real(kind=Prec) :: delta,Te,vis,Sster,c1,c2,wster
+                !total volume sediment concentration
                 Real(kind=Prec),dimension(1-mbc:mx+mbc,1-mbc:my+mbc,gmax) :: C
                 Real(kind=Prec),dimension(gmax) :: w,R,alpha
                 !output
@@ -279,12 +294,10 @@
                 Real(kind=Prec),dimension(1-mbc:mx+mbc,1-mbc:my+mbc,gmax) :: Ts,ceq,ceqs,ceqb
 
                 !output
+                ! ceqsg and ceqbg are equilibrium suspended load and equibrium bed load respectively
+                ! Tsg is the adaptation time in equation 8 in the paper
                 Real(kind=Prec),intent(inout),dimension(1-mbc:mx+mbc,1-mbc:my+mbc,gmax) :: Tsg,ceqbg,ceqsg
 
-                !allocate(z0(1-mbc:mx+mbc,1-mbc:my+mbc))
-                !allocate(ws(1-mbc:mx+mbc,1-mbc:my+mbc,gmax))
-                !allocate(ub_cr(1-mbc:mx+mbc,1-mbc:my+mbc,gmax),us_cr1(1-mbc:mx+mbc,1-mbc:my+mbc,gmax),&
-                !        us_cr2(1-mbc:mx+mbc,1-mbc:my+mbc,gmax))
 
 
                 wet = 0.0
@@ -349,6 +362,8 @@
                     do j=1-mbc,my+mbc
                         do i=1-mbc,mx+mbc
                             if(term1(i,j)>Ub_cr(i,j,k) .and. hloc(i,j)>eps) then
+                                ! This is ()^2.4 in equation 10 and 11 in the paper
+                                ! The paper has a typo: U_cr^s should be U_cr^b
                                 term2(i,j)=(term1(i,j)-Ub_cr(i,j,k))**2.40
                             endif
                             ceq(i,j,k) = (Asb(i,j)+Ass)*term2(i,j)/hloc(i,j)
@@ -367,6 +382,7 @@
                                 ceqb(i,j,k) = (1-perc)*min(ceq(i,j,k),cmax/gmax/2.0)
                                 ceqs(i,j,k) = perc*min(ceq(i,j,k),cmax/gmax/2.0)
                             end if
+                            ! pbbed: percentage of each grain size in each layer (3rd index)
                             ceqbg(i,j,k) = ceqb(i,j,k)*wet(i,j)*pbbed(i,j,1,k)
                             ceqsg(i,j,k) = ceqs(i,j,k)*wet(i,j)*pbbed(i,j,1,k)
                             !print *, i,j
@@ -551,7 +567,7 @@
                     enddo
                 enddo
                 dzbdy(:,my+mbc) = dzbdy(:,my+mbc-1)
-                ! calculate equibrium sediment concentration
+                ! calculate equibrium sediment concentration: ceqbg and ceqsg
                 if (trim=='soulsby_vanrijn') then           ! Soulsby van Rijn
                     call sb_vr(mbc,mx,my,u,v,h,Tsg,ceqbg,ceqsg)
                 elseif (trim=='vanthiel_vanrijn') then       ! Van Thiel de Vries & Reniers 2008
@@ -573,7 +589,10 @@
                 enddo
 
                 ! compute diffusion coefficient
+                ! Dc is Dh in equation 8
                 Dc = facDc*(nuh+nuhfac*h*(DR/rho)**(1.0/3.0))
+                ! ccgt is suspended load of last time step
+                ! ccbgt is bed load of last time step
                 cc = ccgt
                 ccb = ccbgt
                 Sus = 0.0
@@ -586,6 +605,7 @@
                     ! x-direction
                     do j=1-mbc,my+mbc
                         do i=1-mbc,mx+mbc-1
+                            ! TODO: figure out min(i+1,...) here. May affect AMR
                             if(u(i,j)>0.0) then
                                 cut(i,j,k)=thetanum*cc(i,j,k)+(1.0-thetanum)*cc(min(i+1,mx+mbc-1),j,k)
                                 cubt(i,j,k)=thetanum*pbbed(i,j,1,k)*ceqbg(i,j,k)+(1.0-thetanum)&
@@ -601,6 +621,8 @@
                                 cubt(i,j,k)=0.50*(pbbed(i,j,1,k)*ceqbg(i,j,k)+pbbed(i+1,j,1,k)*ceqbg(i+1,j,k))
                                 !cubt(i,j,k)=0.50*(ccb(i,j,k)+ccb(i+1,j,k))
                             endif
+                            ! QUESTION: why do we need sum along k axis here 
+                            ! when we are in the loop of k
                             dcsdx(i,j)=(sum(cc(i+1,j,:))-sum(cc(i,j,:)))/dx
                             dcbdx(i,j)=(sum(ccb(i+1,j,:))-sum(ccb(i,j,:)))/dx
                         enddo
@@ -612,6 +634,8 @@
                     !Sub = 0.0
                     do j=1-mbc,my+mbc
                         do i=1-mbc,mx+mbc
+                        ! This part (the 5 lines below) is an alternative to equation 31
+                        ! compute sediment flux
                         ! suspended load
                             Sus(i,j,k)=(cut(i,j,k)*u(i,j)*h(i,j)-Dc(i,j)*h(i,j)*dcsdx(i,j) &
                                 -facsl*cut(i,j,k)*sqrt(vmag2(i,j))*h(i,j)*dzbdx(i,j))*wet(i,j)   !No bed slope term in suspended transport?
@@ -632,6 +656,9 @@
                         enddo
                     enddo
                     pbbedu(mx+mbc,:) = pbbedu(mx+mbc-1,:)
+                    
+                    ! TODO: Hui said I may comment out the do loop below
+                    ! This may be only required by multiple grain size case
                     do j=1-mbc,my+mbc
                         do i=1-mbc,mx+mbc
                             Sub(i,j,k) = pbbedu(i,j)*Sub(i,j,k)
@@ -699,6 +726,7 @@
                         enddo
                     enddo
                     !call Flux_vector(mbc,mx,my,u,v,h,cc,ccb)
+                    ! This part update concentration by solving equation 8
                     if (my>0) then
                         do j=2-mbc,my+mbc-1
                             do i=2-mbc,mx+mbc-1

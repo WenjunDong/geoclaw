@@ -57,6 +57,14 @@
                 Real(kind=Prec),dimension(1-mbc:mx+mbc,1-mbc:my+mbc,gmax) :: Sout,fre,dzg,edg
                 Real(kind=Prec),dimension(1-mbc:mx+mbc,1-mbc:my+mbc,gmax) :: ftem
                 Real(kind=Prec) :: Savailable
+
+
+                ! variables in cell faces:
+                ! fre, Sout, indSub, indSus
+                ! Susg, Subg, Svsg, Svbg
+
+
+                ! check sediment transport by water
                 wet = 0.0
 
                 do i = 1-mbc, mx+mbc
@@ -70,18 +78,22 @@
                 !allocate(subg(1-mbc:mx+mbc,1-mbc:my+mbc,gmax))
                 !print *, zb(15,10)
 
+                ! compute sediment flux: Susg, Subg, Svsg, Svbg
+                ! cu, cub, cv, cvb are related to source term. So just
+                ! leave them now
+                ! ccg and ccbg are not used in this subroutine
                 call transus(mbc,mx,my,dx,dy,t,u,v,h,dt,cu,cub,cv,cvb,ccg,ccbg,Susg,Subg,Svbg,Svsg)
 
-                !print *, zb
 
                 dzbdt  = 0.0
-                !sedero = 0.0
-                !print *, pbbed
-                !print *, dx,dy
 
                 if (t>=morstart .and. morfac > .9990) then
+                    !
+                    ! bed_predict
 
 
+                    ! reduce sediment transports when hard layer comes to surface
+                    ! this step is mainly necessary at the transition from hard layers to sand
                     if (struct == 1) then
                         indSus = 0
                         indSub = 0
@@ -170,7 +182,7 @@
                                             if (my>0) then
                                                 Svsg(i,j,k)   = fre(i,j,k)*indSvs(i,j,k)*Svsg(i,j,k) &
                                                         + (1-indSvs(i,j,k))*Svsg(i,j,k)
-                                                Svsg(i,j-1,k) = fre(i,j,k)*(1-indSvs(i,j-1,k))*Svsg(i,j-1,k) &
+                                                Svsg(i,j-1,k) = fre(i,j-1,k)*(1-indSvs(i,j-1,k))*Svsg(i,j-1,k) &
                                                         + indSvs(i,j-1,k)*Svsg(i,j-1,k)
                                             endif !jmax > 0
                                         endif ! sourcesink = 0
@@ -179,6 +191,7 @@
                             enddo !jmax
                         enddo !gmax
                     endif !struct == 1
+                    ! compute ceqbg and ceqsg
                     if (trim=='soulsby_vanrijn') then           ! Soulsby van Rijn
                         call sb_vr(mbc,mx,my,u,v,h,Tsg,ceqbg,ceqsg)
                     elseif (trim=='vanthiel_vanrijn') then       ! Van Thiel de Vries & Reniers 2008
@@ -191,17 +204,7 @@
                             ! positive in case of erosion
 
                                 if (sourcesink==0) then
-                                    !print *,dzg(i,j,:)
-                                    !print *, i,j
-                                    !print *, cu(i,j,:)+cv(i,j,:)+cub(i,j,:)+cvb(i,j,:)
-                                   ! print *, ceqsg(i,j,:),'ceqsg'
-                                    !print *, ceqbg(i,j,:),'ceqbg'
-                                    !print *, h(i,j),u(i,j),v(i,j)
-                                    !print *, pbbed(i,j,1,:)
-                                    !print *,Susg(i,j,:),'Susg'!*dx*h(i,j)-Susg(i-1,j,:)*dx*h(i-1,j)'ceqsg'
-                                    !print *,Svsg(i,j,:),'Svsg'!*dy*h(i,j)-Svsg(i,j-1,:)*dy*h(i,j-1)
-                                    !print *,Subg(i,j,:),'Subg'!*dx*h(i,j)-Subg(i-1,j,:)*dx*h(i-1,j)
-                                    !print *,Svbg(i,j,:),'Svbg'!*dy*h(i,j)-Svbg(i,j-1,:)*dy*h(i,j-1)
+                                    !equation 36 in the paper
                                     do k = 1, gmax
                                         dzg(i,j,k)=wet(i,j)*morfac*dt/(1.0-por)*( &
                                             ! dz from sus transport gradients
@@ -211,24 +214,23 @@
                                             Subg(i,j,k)*dy-Subg(i-1,j,k)*dy+&
                                             Svbg(i,j,k)*dx-Svbg(i,j-1,k)*dx))/(dx*dy)! +&
                                     end do
-                                        !source term
-                                        !(cu(i,j,:)+cv(i,j,:)+cub(i,j,:)+cvb(i,j,:)-ceqsg(i,j,:)-ceqbg(i,j,:))*h(i,j)/Tsg(i,j,:)
-                                    !print *,(cu(i,j,:)+cv(i,j,:)+cub(i,j,:)+cvb(i,j,:)-ceqsg(i,j,:)-ceqbg(i,j,:))*h(i,j)/Tsg(i,j,:)
-                                    !print *, dzg(i,j,:),'dzg'
+                                !source term and only have suspended load
                                 elseif (sourcesink==1) then
                                     dzg(i,j,:)=morfac*dt/(1.0-por)*( &
                                         ! dz from sus transport gradients
                                         Susg(i,j,:)-Susg(i-1,j,:) +&
                                         Svsg(i,j,:)-Svsg(i,j-1,:) +&
                                         !source term
-                                        (cu(i,j,:)+cv(i,j,:)-ceqsg(i,j,:))*h(i,j)/Tsg(i,j,:))
+                                        (cu(i,j,:)+cv(i,j,:)-ceqsg(i,j,:))*h(i,j)/Tsg(i,j,:))/(dx*dy)
                                 endif
+
                                 if (gmax==1) then ! Simple bed update in case one fraction
                                     zb(i,j) = zb(i,j)-sum(dzg(i,j,:))
                                     dzbdt(i,j) = dzbdt(i,j)-sum(dzg(i,j,:))
                                     sedero(i,j) = sedero(i,j)-sum(dzg(i,j,:))
                                     totalthick(i,j) = max(0.0,totalthick(i,j)-sum(dzg(i,j,:)))
-                                else
+
+                                else ! multiple grain size classes
                                     edg(i,j,:) = dzg(i,j,:)*(1.0-por)/dt
                                     if (totalthick(i,j)>thick) then
                                         totalnum(i,j) = nint(totalthick(i,j)/thick)
@@ -243,45 +245,36 @@
                                     endif
                                     nd_var = totalnum(i,j)
                                     zb(i,j) = zb(i,j)-sum(dzg(i,j,:))
+                                    ! totalthick(i,j) = totalthick(i,j) - sum(dzg(i,j,:))
                                     sederold(i,j)=sedero(i,j)
                                     sedero(i,j) = sedero(i,j)+sum(dzg(i,j,:))
                                     if (abs(sedero(i,j)) > 1e-10) then
-                                        pbbed(i,j,1,1) = abs((pbbed(i,j,1,1)*sederold(i,j)+dzg(i,j,1))/sedero(i,j))
-                                        pbbed(i,j,1,2) = abs((pbbed(i,j,1,2)*sederold(i,j)+dzg(i,j,2))/sedero(i,j))
+                                        do k=1, gmax
+                                            pbbed(i,j,1,k) = abs((pbbed(i,j,1,k)*sederold(i,j)+dzg(i,j,k))/sedero(i,j))
+                                        end do
+                                        ! pbbed(i,j,1,1) = abs((pbbed(i,j,1,1)*sederold(i,j)+dzg(i,j,1))/sedero(i,j))
+                                        ! pbbed(i,j,1,2) = abs((pbbed(i,j,1,2)*sederold(i,j)+dzg(i,j,2))/sedero(i,j))
                                     end if
-                                    !ftem(i,j,1) = pbbed(i,j,1,1)/(pbbed(i,j,1,1)+pbbed(i,j,1,2))
-                                    !ftem(i,j,2) = pbbed(i,j,1,2)/(pbbed(i,j,1,1)+pbbed(i,j,1,2))
-                                    pbbed(i,j,1,1) = pbbed(i,j,1,1)/(pbbed(i,j,1,1)+pbbed(i,j,1,2))
-                                    pbbed(i,j,1,2) = 1.0-pbbed(i,j,1,1)!pbbed(i,j,1,2)/(pbbed(i,j,1,1)+pbbed(i,j,1,2))
-                                    !print *, pbbed(i,j,1,2)
-                                    !print *
-                                    !print *, i,j
-                                    !print *, zb(i,j)
-                                    !print *, u(i,j)
-                                    !print *, pbbed(i,j,1,:)
-                                    !print *, susg(i,j,:)
-                                    !print *, dzg(i,j,:)
+                                    do k=1,gmax
+                                        pbbed(i,j,1,k) = pbbed(i,j,1,k)/sum(pbbed(i,j,1,:))
+                                    end do
+                                    ! pbbed(i,j,1,1) = pbbed(i,j,1,1)/(pbbed(i,j,1,1)+pbbed(i,j,1,2))
+                                    ! pbbed(i,j,1,2) = 1.0-pbbed(i,j,1,1)!pbbed(i,j,1,2)/(pbbed(i,j,1,1)+pbbed(i,j,1,2))
                                     !call update_fractions(i,j,dzbed(i,j,:),pbbed(i,j,:,:),edg(i,j,:),sum(dzg(i,j,:)),dt)
                                 endif
                             enddo ! imax+1
+                            ! QUESTION: It seems like this only update
+                            ! B.C. along left side of the grid?
                             zb(2-mbc,j) = zb(1-mbc,j)
                             !zb(1-mbc,j) = zb(2-mbc,j)
                         enddo ! jmax+1
-                        !print *, 'good'
+                        ! QUESTION: It seems like this only update
+                        ! B.C. along bottom side of the grid?
                         zb(:,2-mbc) = zb(:,1-mbc)
                         i =2
-                        !print *, zb(2,320)
-                        !print *, pbbed(2,150,1,:)
-                        !print *, ftem(2,240,:)
-                        !print *, dzg(2,150,:)
-                        print *, h(2,400)
-                        !print *, v(2,150)
-                        !do j = 1, 34
-                            !print *, pbbed(i,j,1,:)
-                            !print *, h(i,j)
-                            !print *, dzg(i,j,:)
-                        !end do
                     else
+                        ! 1D case
+                        ! the sourcesink==0 case seems to missing 1/dx?
                         j=1
                         do i=1-mbc,mx+mbc
                             ! bed level changes per fraction in this morphological time step in meters sand including pores
@@ -320,30 +313,13 @@
                                     totalnum(i,j) = totalnum(i,j) - 1
                                 endif
                                 nd_var = totalnum(i,j)
+                                !this is used updated pbbed
                                 !call update_fractions(i,j,dzbed(i,j,:),pbbed(i,j,:,:),edg(i,j,:),sum(dzg(i,j,:)),dt)
                             endif
                         enddo ! imax
                     endif !jmax = 1
                 endif !t
                 i = 1
-                !do j = 1-mbc,my+mbc
-                !    print *, i,j
-                !    print *, dzg(i,j,:),'dzg'
-                !    print *, zb(i,j),'zb'
-                !    print *, h(i,j),'h',u(i,j),'u',v(i,j),'v'
-                !    print *, wet(i,j),'wet'
-                !    print *, ceqsg(i,j,:),'ceqsg'
-                !    print *, ceqbg(i,j,:),'ceqbg'
-                !    print *, cu(i,j,:)+cv(i,j,:)+cub(i,j,:)+cvb(i,j,:)
-                !    print *,Susg(i,j,:),'Susg'!*dx*h(i,j)-Susg(i-1,j,:)*dx*h(i-1,j)'ceqsg'
-                !    print *,Svsg(i,j,:),'Svsg'!*dy*h(i,j)-Svsg(i,j-1,:)*dy*h(i,j-1)
-                !    print *,Subg(i,j,:),'Subg'!*dx*h(i,j)-Subg(i-1,j,:)*dx*h(i-1,j)
-                !    print *,Svbg(i,j,:),'Svbg'!
-                !end do
-                !aux(1,:,:) = zb
-                !open (unit=1,status='unknown',position='Append',file="zbupdate.txt",action="write")
-                !write (1,*),zb(3,:)
-                !close(1)
                 open (unit=1,status='replace',position='Append',file="zb.txt",action="write")
                 write (1,*),zb(1,:)
                 close(1)
