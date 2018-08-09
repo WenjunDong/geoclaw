@@ -246,7 +246,7 @@ program amr2
     read(inunit,*) dimensional_split
     if (dimensional_split > 0) then
         print *, '*** ERROR ***  dimensional_split = ', dimensional_split
-        print *, ' dimensional splitting not supported in amrclaw'
+        print *, ' dimensional splitting not supported in geoclaw'
         stop
     endif
 
