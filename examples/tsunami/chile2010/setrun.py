@@ -83,8 +83,8 @@ def setrun(claw_pkg='geoclaw'):
 
 
     # Number of grid cells: Coarsest grid
-    clawdata.num_cells[0] = 30
-    clawdata.num_cells[1] = 30
+    clawdata.num_cells[0] = 60
+    clawdata.num_cells[1] = 60
 
     # ---------------
     # Size of system:
@@ -97,7 +97,7 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.num_aux = 3
 
     # Index of aux array corresponding to capacity function, if there is one:
-    clawdata.capa_index = 2
+    clawdata.capa_index = 2 # 1-indexed
 
     
     
@@ -172,7 +172,7 @@ def setrun(claw_pkg='geoclaw'):
 
     # Initial time step for variable dt.
     # If dt_variable==0 then dt=dt_initial for all steps:
-    clawdata.dt_initial = 0.2
+    clawdata.dt_initial = 0.1
 
     # Max time step to be allowed if variable dt used:
     clawdata.dt_max = 1e+99
@@ -366,6 +366,8 @@ def setgeo(rundata):
        
     # == Physics ==
     geo_data.gravity = 9.81
+    # coordinate_system = 1 means Cartesian grid in meters
+    # coordinate_system = 2 means lat-long grid on sphere
     geo_data.coordinate_system = 2
     geo_data.earth_radius = 6367.5e3
 
