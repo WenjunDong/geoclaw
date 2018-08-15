@@ -11,6 +11,8 @@ Call functions with makeplots==True to create plots of topo, slip, and dtopo.
 from __future__ import absolute_import
 from __future__ import print_function
 import os
+import matplotlib as mpl
+mpl.use('Agg')
 
 import clawpack.clawutil.data
 
