@@ -15,14 +15,6 @@ c
 
       integer listgrids(numgrids(level))
 
-      iadd(ivar,i,j)  = loc    + ivar-1 + nvar*((j-1)*mitot+i-1)
-      iaddf(ivar,i,j) = locf   + ivar-1 + nvar*((j-1)*mi+i-1)
-      iaddfaux(i,j)   = locfaux + mcapa-1 + naux*((j-1)*mi + (i-1))
-      iaddcaux(i,j)   = loccaux + mcapa-1 + naux*((j-1)*mitot+(i-1))
-c  topo in aux component 1
-      iaddftopo(i,j)   = locfaux +  naux*((j-1)*mi + (i-1))
-      iaddctopo(i,j)   = loccaux +  naux*((j-1)*mitot+(i-1))
-
 c
 c :::::::::::::::::::::::::: UPDATE :::::::::::::::::::::::::::::::::
 c update - update all grids at level 'level'.
@@ -115,7 +107,8 @@ c
               write(outunit,101) i,j,mptr,iff,jff,mkid
  101          format(' updating pt. ',2i4,' of grid ',i3,' using ',2i4,
      1               ' of grid ',i4)
-              write(outunit,102)(alloc(iadd(ivar,i,j)),ivar=1,nvar)
+              write(outunit,102)(
+     &        alloc(iadd(ivar,i,j,loc,nvar,mitot)),ivar=1,nvar)
  102          format(' old vals: ',4e25.15)
            endif
 c
@@ -138,10 +131,10 @@ c     and is never increased given an increase in mass
       if (mcapa .eq. 0) then
          capac=1.0d0
       else
-         capac=alloc(iaddcaux(i,j))
+         capac=alloc(iaddcaux(i,j,loccaux,mcapa,naux,mitot))
          endif
 
-      bc = alloc(iaddctopo(i,j))
+      bc = alloc(iaddctopo(i,j,loccaux,naux,mitot))
 
       etasum = 0.d0
       hsum = 0.d0
@@ -155,13 +148,15 @@ c     and is never increased given an increase in mass
             if (mcapa .eq. 0) then
                capa=1.0d0
             else
-               capa=alloc(iaddfaux(iff+ico-1,jff+jco-1))
+               capa=alloc(iaddfaux(iff+ico-1,jff+jco-1,
+     &         locfaux,mcapa,naux,mi))
             endif
 
-            hf = alloc(iaddf(1,iff+ico-1,jff+jco-1))*capa 
-            bf = alloc(iaddftopo(iff+ico-1,jff+jco-1))*capa
-            huf= alloc(iaddf(2,iff+ico-1,jff+jco-1))*capa 
-            hvf= alloc(iaddf(3,iff+ico-1,jff+jco-1))*capa 
+            hf = alloc(iaddf(1,iff+ico-1,jff+jco-1,locf,nvar,mi))*capa 
+            bf = alloc(iaddftopo(
+     &          iff+ico-1,jff+jco-1,locfaux,naux,mi))*capa
+            huf= alloc(iaddf(2,iff+ico-1,jff+jco-1,locf,nvar,mi))*capa 
+            hvf= alloc(iaddf(3,iff+ico-1,jff+jco-1,locf,nvar,mi))*capa 
 
             if (hf > dry_tolerance) then
                etaf = hf+bf
@@ -193,11 +188,12 @@ c     and is never increased given an increase in mass
          endif
 
 c     # set h on coarse grid based on surface, not conservative near shoreline
-      alloc(iadd(1,i,j)) = hc / capac 
-      alloc(iadd(2,i,j)) = huc / capac 
-      alloc(iadd(3,i,j)) = hvc / capac 
+      alloc(iadd(1,i,j,loc,nvar,mitot)) = hc / capac 
+      alloc(iadd(2,i,j,loc,nvar,mitot)) = huc / capac 
+      alloc(iadd(3,i,j,loc,nvar,mitot)) = hvc / capac 
 c
-      if (uprint) write(outunit,103)(alloc(iadd(ivar,i,j)),
+      if (uprint) write(outunit,103)(
+     &  alloc(iadd(ivar,i,j,loc,nvar,mitot)),
      .     ivar=1,nvar)
  103  format(' new vals: ',4e25.15)
 c
@@ -222,3 +218,45 @@ c
 
  99   return
       end
+
+      pure function iadd(ivar,i,j,loc,nvar,mitot) result(p)
+          implicit none
+          integer,intent(in) :: ivar, i, j, loc, nvar, mitot
+          integer :: p
+          p = loc    + ivar-1 + nvar*((j-1)*mitot+i-1)
+      end function iadd
+
+      pure function iaddf(ivar,i,j,locf,nvar,mi) result(p)
+          implicit none
+          integer,intent(in) :: ivar, i, j, locf, nvar, mi
+          integer :: p
+          p = locf + ivar-1 + nvar*((j-1)*mi+i-1)
+      end function iaddf
+
+      pure function iaddfaux(i,j,locfaux,mcapa,naux,mi) result(p)
+          implicit none
+          integer,intent(in) :: i,j,locfaux,mcapa,naux,mi
+          integer :: p
+          p = locfaux + mcapa-1 + naux*((j-1)*mi + (i-1))
+      end function iaddfaux
+
+      pure function iaddcaux(i,j,loccaux,mcapa,naux,mitot) result(p)
+          implicit none
+          integer,intent(in) :: i,j,loccaux,mcapa,naux,mitot
+          integer :: p
+          p = loccaux + mcapa-1 + naux*((j-1)*mitot+(i-1))
+      end function iaddcaux
+
+      pure function iaddftopo(i,j,locfaux,naux,mi) result(p)
+          implicit none
+          integer,intent(in) :: i,j,locfaux,naux,mi
+          integer :: p
+          p = locfaux +  naux*((j-1)*mi + (i-1))
+      end function iaddftopo
+
+      pure function iaddctopo(i,j,loccaux,naux,mitot) result(p)
+          implicit none
+          integer,intent(in) :: i,j,loccaux,naux,mitot
+          integer :: p
+          p = loccaux +  naux*((j-1)*mitot+(i-1))
+      end function iaddctopo
