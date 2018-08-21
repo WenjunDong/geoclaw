@@ -272,6 +272,12 @@ c            # with capa array.
 
  50      continue
 
+c     # Copied here from b4step2 since need to do before step2y:
+      forall(i=1:mitot, j=1:mjtot, q(1,i,j) < dry_tolerance)
+        q(1,i,j) = max(q(1,i,j),0.d0)
+        q(2:meqn,i,j) = 0.d0
+      end forall
+
       call step2y(mbig,nvar,maux, mbc,mx,my,q,aux,dy,dt,cflgrid,
      &              gm,gp,rpn2)
 
