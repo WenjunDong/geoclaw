@@ -28,7 +28,7 @@ module topo_module
 
     ! Topography file data
     integer :: test_topography
-    character(len=150), allocatable :: topofname(:)
+    character(len=250), allocatable :: topofname(:)
     integer :: mtopofiles,mtoposize
     real(kind=8), allocatable :: xlowtopo(:), ylowtopo(:), tlowtopo(:)
     real(kind=8), allocatable :: xhitopo(:), yhitopo(:), thitopo(:)
@@ -58,7 +58,7 @@ module topo_module
     real(kind=8) :: dt_max_dtopo
 
     ! File data parameters
-    character*150, allocatable :: dtopofname(:)
+    character*250, allocatable :: dtopofname(:)
     real(kind=8), allocatable :: xlowdtopo(:),ylowdtopo(:),xhidtopo(:)
     real(kind=8), allocatable :: yhidtopo(:),t0dtopo(:),tfdtopo(:)
     real(kind=8), allocatable :: dxdtopo(:),dydtopo(:),dtdtopo(:)
@@ -444,7 +444,7 @@ contains
 
         ! Arguments
         integer, intent(in) :: mx,my,topo_type
-        character(len=150), intent(in) :: fname
+        character(len=250), intent(in) :: fname
         real(kind=8), intent(inout) :: topo(1:mx*my)
 
         ! Locals
@@ -698,7 +698,7 @@ contains
         implicit none
 
         ! Input and Output
-        character(len=150), intent(in) :: fname
+        character(len=250), intent(in) :: fname
         integer, intent(in) :: topo_type
         integer, intent(out) :: mx, my
         real(kind=8), intent(out) :: xll, yll, xhi, yhi, dx, dy
@@ -1118,7 +1118,7 @@ contains
 
       ! Arguments
       integer, intent(in) :: mx,my,mt,dtopo_type
-      character*150, intent(in) :: fname
+      character*250, intent(in) :: fname
       real(kind=8), intent(inout) :: dtopo(1:mx*my*mt)
 
       ! Local
@@ -1182,7 +1182,7 @@ contains
         implicit none
 
         ! Input Arguments
-        character*150, intent(in) :: fname
+        character*250, intent(in) :: fname
         integer, intent(in) :: topo_type
 
         ! Output Arguments

@@ -94,7 +94,7 @@ contains
         ! Local storage
         integer, parameter :: unit = 7
         integer :: ifg
-        character(len=150) :: fname_fg
+        character(len=250) :: fname_fg
         integer :: num_fgmax_grids, num_fgmax_val
 
         if (.not.module_setup) then
