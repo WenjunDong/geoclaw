@@ -41,7 +41,7 @@ contains
         
         ! File handling
         integer, parameter :: unit = 7
-        character(len=150) :: qinit_fname
+        character(len=250) :: qinit_fname
         
         if (.not.module_setup) then
             write(GEO_PARM_UNIT,*) ' '
@@ -154,7 +154,7 @@ contains
         implicit none
         
         ! Subroutine arguments
-        character(len=150) :: fname
+        character(len=250) :: fname
         
         ! Data file opening
         integer, parameter :: unit = 19
