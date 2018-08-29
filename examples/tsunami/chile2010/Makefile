@@ -25,7 +25,7 @@ FFLAGS ?=
 
 USE_OPENMP = TRUE
 USE_DOUBLE_PRECISION = TRUE
-FC = pgfortran
+FC = gfortran
 
 
 # ---------------------------------
@@ -48,7 +48,6 @@ EXCLUDE_SOURCES = \
 # ----------------------------------------
 # List of custom sources for this program:
 # ----------------------------------------
-
 
 MODULES = \
 

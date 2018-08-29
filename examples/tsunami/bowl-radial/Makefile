@@ -26,7 +26,7 @@ FFLAGS ?=
 
 USE_OPENMP = TRUE
 USE_DOUBLE_PRECISION = TRUE
-FC = pgfortran
+FC = gfortran
 
 
 # ---------------------------------
