@@ -403,8 +403,8 @@ c For variable time stepping, use max speed seen on this grid to
 c choose the allowable new time step dtnew.  This will later be
 c compared to values seen on other grids.
 c
-       if (cflgrid .gt. 0.d0) then
-           dtnew = dt*cfl/cflgrid
+       if (cfl_level .gt. 0.d0) then
+           dtnew = dt*cfl/cfl_level
          else
 c          # velocities are all zero on this grid so there's no
 c          # time step restriction coming from this grid.
