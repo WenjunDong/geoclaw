@@ -165,12 +165,12 @@ c     and is never increased given an increase in mass
                etaf = 0.d0
                huf=0.d0
                hvf=0.d0
-               endif
+            endif
 
-               hsum   = hsum + hf
-               husum  = husum + huf
-               hvsum  = hvsum + hvf
-               etasum = etasum + etaf
+            hsum   = hsum + hf
+            husum  = husum + huf
+            hvsum  = hvsum + hvf
+            etasum = etasum + etaf
             enddo
          enddo
 
