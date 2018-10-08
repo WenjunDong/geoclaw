@@ -6,6 +6,8 @@ GEOLIB:=$(CLAW)/geoclaw/src/2d/shallow
 #list of common sources for amr 2d codes
 COMMON_MODULES += \
  $(AMRLIB)/amr_module.f90 \
+ $(AMRLIB)/timer_module.f90 \
+ $(AMRLIB)/helper_module.f90 \
  $(AMRLIB)/regions_module.f90 
 
 #list of common sources needed for geoclaw codes (subset of amr dependencies)
