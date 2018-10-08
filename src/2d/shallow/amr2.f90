@@ -103,6 +103,7 @@ program amr2
     use regions_module, only: set_regions
     use fgmax_module, only: set_fgmax, FG_num_fgrids
     use multilayer_module, only: set_multilayer
+    use timer_module
 
     implicit none
 
@@ -731,7 +732,7 @@ program amr2
     write(*,*)
     write(outunit,*)
     
-    
+    call print_all_cpu_timers()
     
     
     !format_string = "('Total time to solution = ',1f16.8,' s, using', i3,' threads')"

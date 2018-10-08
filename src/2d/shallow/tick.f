@@ -13,6 +13,8 @@ c
       use gauges_module, only: print_gauges_and_reset_nextLoc
 
       use storm_module, only: landfall, display_landfall_time
+      use timer_module
+      use helper_module
 
 
       implicit double precision (a-h,o-z)
@@ -53,6 +55,8 @@ c ::::::::::::::::::::::::::::::::::::;::::::::::::::::::::::::::
 c
       call system_clock(tick_clock_start,tick_clock_rate)
       call cpu_time(tick_cpu_start)
+      call take_cpu_timer("Total run time", timer_total_run_time)
+      call cpu_timer_start(timer_total_run_time)
 
 
       ncycle         = nstart
@@ -262,7 +266,11 @@ c
  90       continue
 
 
+          call take_cpu_timer("Advance level "//toString(level), 
+     &      timer_advanc_start+level-1)
+          call cpu_timer_start(timer_advanc_start+level-1)
           call advanc(level,nvar,dtlevnew,vtime,naux)
+          call cpu_timer_stop(timer_advanc_start+level-1)
 
 c Output time info
           timenew = tlevel(level)+possk(level)
@@ -456,6 +464,7 @@ c
 c  # checkpoint everything for possible future restart
 c  # (unless we just did it based on dumpchk)
 c
+      call cpu_timer_stop(timer_total_run_time)
       call system_clock(tick_clock_finish,tick_clock_rate)
       call cpu_time(tick_cpu_finish)
       timeTick = timeTick + tick_clock_finish - tick_clock_start 
