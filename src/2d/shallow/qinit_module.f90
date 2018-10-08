@@ -11,17 +11,17 @@ module qinit_module
     integer, public :: qinit_type
     
     ! Work array
-    real(kind=8), private, allocatable :: qinit(:)
+    real(CLAW_REAL), private, allocatable :: qinit(:)
 
     ! Geometry
-    real(kind=8) :: x_low_qinit
-    real(kind=8) :: y_low_qinit
-    real(kind=8) :: t_low_qinit
-    real(kind=8) :: x_hi_qinit
-    real(kind=8) :: y_hi_qinit
-    real(kind=8) :: t_hi_qinit
-    real(kind=8) :: dx_qinit
-    real(kind=8) :: dy_qinit
+    real(CLAW_REAL) :: x_low_qinit
+    real(CLAW_REAL) :: y_low_qinit
+    real(CLAW_REAL) :: t_low_qinit
+    real(CLAW_REAL) :: x_hi_qinit
+    real(CLAW_REAL) :: y_hi_qinit
+    real(CLAW_REAL) :: t_hi_qinit
+    real(CLAW_REAL) :: dx_qinit
+    real(CLAW_REAL) :: dy_qinit
     
     integer, private :: mx_qinit
     integer, private :: my_qinit
@@ -86,16 +86,16 @@ contains
     
         ! Subroutine arguments
         integer, intent(in) :: meqn,mbc,mx,my,maux
-        real(kind=8), intent(in) :: xlow_patch,ylow_patch,dx,dy
-        real(kind=8), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-        real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+        real(CLAW_REAL), intent(in) :: xlow_patch,ylow_patch,dx,dy
+        real(CLAW_REAL), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+        real(CLAW_REAL), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
         
         ! Local
         integer :: i,j
-        real(kind=8) :: ximc,xim,x,xip,xipc,yjmc,yjm,y,yjp,yjpc,dq
+        real(CLAW_REAL) :: ximc,xim,x,xip,xipc,yjmc,yjm,y,yjp,yjpc,dq
         
         ! Topography integral function
-        real(kind=8) :: topointegral
+        real(CLAW_REAL) :: topointegral
         
         if (qinit_type > 0) then
             do i=1-mbc,mx+mbc
@@ -159,7 +159,7 @@ contains
         ! Data file opening
         integer, parameter :: unit = 19
         integer :: i,num_points,status
-        double precision :: x,y
+        real(CLAW_REAL) :: x,y
         
         print *,'  '
         print *,'Reading qinit data from file  ', fname

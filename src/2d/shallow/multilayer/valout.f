@@ -6,7 +6,7 @@ c
       use amr_module
       use geoclaw_module, only: rho
       use multilayer_module, only: num_layers
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
       character(len=10) :: fname1, fname2, fname3, fname4
 
 c     # GeoClaw specific output....  add eta to q array before printing
@@ -18,9 +18,9 @@ c     # set outaux = .true. to also output the aux arrays to fort.a<iframe>
 
       logical outaux
       integer output_aux_num 
-      real(kind=8) :: h(num_layers), hu(num_layers), hv(num_layers)
-      real(kind=8) :: eta(num_layers)
-      real(kind=8), allocatable :: qeta(:)
+      real(CLAW_REAL) :: h(num_layers), hu(num_layers), hv(num_layers)
+      real(CLAW_REAL) :: eta(num_layers)
+      real(CLAW_REAL), allocatable :: qeta(:)
 
       iadd(ivar,i,j)  = loc + ivar - 1 + nvar*((j-1)*mitot+i-1)
       iaddaux(iaux,i,j) = locaux + iaux-1 + naux*(i-1) +

@@ -24,23 +24,23 @@ subroutine filval(val, mx, my, dx, dy, level, time, valc, auxc, mic, &
     ! Input
     integer, intent(in) :: mx, my, level, mic, mjc, nvar, mptr, ilo, ihi
     integer, intent(in) :: jlo, jhi, naux, locflip
-    real(kind=8), intent(in) :: dx, dy, time, xleft, xright, ybot, ytop
-    real(kind=8), intent(in) :: valc(nvar,mic,mjc), auxc(naux,mic,mjc)
+    real(CLAW_REAL), intent(in) :: dx, dy, time, xleft, xright, ybot, ytop
+    real(CLAW_REAL), intent(in) :: valc(nvar,mic,mjc), auxc(naux,mic,mjc)
 
     ! Output
-    real(kind=8), intent(in out) :: sp_over_h
-    real(kind=8), intent(in out) :: val(nvar,mx,my), aux(naux,mx,my)
+    real(CLAW_REAL), intent(in out) :: sp_over_h
+    real(CLAW_REAL), intent(in out) :: val(nvar,mx,my), aux(naux,mx,my)
 
     ! Local storage
     integer :: refinement_ratio_x, refinement_ratio_y, iclo, jclo, ichi, jchi, ng, i, ico, ifine
     integer :: ii, ivar, j, jco, jfine, jj
-    real(kind=8) :: coarseval(3), dx_coarse, dy_coarse, xl, xr, yb, yt, area
-    real(kind=8) :: dividemass, finemass, hvf, s1m, s1p, slopex, slopey, vel
-    real(kind=8) :: velmax, velmin, vf, vnew, xoff, yoff
+    real(CLAW_REAL) :: coarseval(3), dx_coarse, dy_coarse, xl, xr, yb, yt, area
+    real(CLAW_REAL) :: dividemass, finemass, hvf, s1m, s1p, slopex, slopey, vel
+    real(CLAW_REAL) :: velmax, velmin, vf, vnew, xoff, yoff
     logical :: fineflag(3)
 
     ! External function definitions
-    real(kind=8) :: get_max_speed
+    real(CLAW_REAL) :: get_max_speed
 
     refinement_ratio_x = intratx(level - 1)
     refinement_ratio_y = intraty(level - 1)
@@ -116,8 +116,8 @@ subroutine filval(val, mx, my, dx, dy, level, time, valc, auxc, mic, &
             finemass = 0.d0
             do ico = 1,refinement_ratio_x
                 do jco = 1,refinement_ratio_y
-                    yoff = (real(jco,kind=8) - 0.5d0) / refinement_ratio_y - 0.5d0
-                    xoff = (real(ico,kind=8) - 0.5d0) / refinement_ratio_x - 0.5d0
+                    yoff = (real(jco,kind=CLAW_REAL) - 0.5d0) / refinement_ratio_y - 0.5d0
+                    xoff = (real(ico,kind=CLAW_REAL) - 0.5d0) / refinement_ratio_x - 0.5d0
                     jfine = (j-2) * refinement_ratio_y + nghost + jco
                     ifine = (i-2) * refinement_ratio_x + nghost + ico
                     val(1,ifine,jfine) = (coarseval(2) + xoff * slopex &
@@ -180,8 +180,8 @@ subroutine filval(val, mx, my, dx, dy, level, time, valc, auxc, mic, &
                         do jco = 1,refinement_ratio_y
                             jfine = (j-2) * refinement_ratio_y + nghost + jco
                             ifine = (i-2) * refinement_ratio_x + nghost + ico
-                            yoff = (real(jco,kind=8) - 0.5d0) / refinement_ratio_y - 0.5d0
-                            xoff = (real(ico,kind=8) - 0.5d0) / refinement_ratio_x - 0.5d0
+                            yoff = (real(jco,kind=CLAW_REAL) - 0.5d0) / refinement_ratio_y - 0.5d0
+                            xoff = (real(ico,kind=CLAW_REAL) - 0.5d0) / refinement_ratio_x - 0.5d0
                             hvf = valc(ivar,i,j) / rho(1) + xoff * slopex &
                                                           + yoff*slopey
                             vf = hvf / (val(1,ifine,jfine) / rho(1))
@@ -198,7 +198,7 @@ subroutine filval(val, mx, my, dx, dy, level, time, valc, auxc, mic, &
                     ! generating new extrema in velocities
                     if (fineflag(1) .or. fineflag(ivar)) then
                         ! more mass now, conserve momentum
-                        area = real(refinement_ratio_x * refinement_ratio_y,kind=8)
+                        area = real(refinement_ratio_x * refinement_ratio_y,kind=CLAW_REAL)
                         dividemass = max(finemass,valc(1,i,j) / rho(1))
                         Vnew = area * valc(ivar,i,j) / (dividemass * rho(1))
 

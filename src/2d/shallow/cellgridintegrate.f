@@ -6,7 +6,7 @@ c====================================================================
 c=====================================================================
 
 
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
 
       dimension topo(mtoposize)
 
@@ -203,7 +203,7 @@ c     !i/o integer
       integer indicator
 
 c     !i/o doubles
-      double precision area,xintlo,xintc,xinthi,yintlo,yintc,yinthi,
+      real(CLAW_REAL) area,xintlo,xintc,xinthi,yintlo,yintc,yinthi,
      &                 x1lo,x1hi,y1lo,y1hi,x2lo,x2hi,y2lo,y2hi
 
 

@@ -84,7 +84,7 @@ c---------------------last modified 1/04/05-----------------------------
       use amr_module, only: mthlim
       use geoclaw_module, only: coordinate_system, earth_radius, deg2rad
 
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
 
       external rpn2, rpt2
       dimension  q1d(meqn, 1-mbc:maxm+mbc)

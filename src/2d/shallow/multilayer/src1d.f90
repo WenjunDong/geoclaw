@@ -14,18 +14,18 @@ subroutine src1d(meqn,mbc,mx1d,q1d,maux,aux1d,t,dt)
 
     ! Input
     integer, intent(in) :: meqn, mbc, mx1d, maux
-    real(kind=8), intent(in) :: t, dt
-    real(kind=8), intent(inout) :: q1d(meqn, mx1d), aux1d(maux, mx1d)
+    real(CLAW_REAL), intent(in) :: t, dt
+    real(CLAW_REAL), intent(inout) :: q1d(meqn, mx1d), aux1d(maux, mx1d)
 
     ! Local storage
     integer :: i, m, bottom_index, bottom_layer, layer_index
     logical :: found
-    real(kind=8) :: h(num_layers), hu, hv, gamma, dgamma, y, fdt, a(2,2)
+    real(CLAW_REAL) :: h(num_layers), hu, hv, gamma, dgamma, y, fdt, a(2,2)
 
     ! Algorithm parameters
     ! Parameter controls when to zero out the momentum at a depth in the
     ! friction source term
-    real(kind=8), parameter :: depth_tolerance = 1.0d-30
+    real(CLAW_REAL), parameter :: depth_tolerance = 1.0d-30
     
     ! Pressure forcing
     ! Handled in Riemann solver

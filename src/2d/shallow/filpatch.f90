@@ -27,12 +27,12 @@ recursive subroutine filrecur(level,nvar,valbig,aux,naux,t,mx,my, &
     ! Input
     integer, intent(in) :: level, nvar, naux, mx, my, nrowst, ncolst
     integer, intent(in) :: ilo,ihi,jlo,jhi,msrc
-    real(kind=8), intent(in) :: t
+    real(CLAW_REAL), intent(in) :: t
     logical  :: patchOnly
 
     ! Output
-    real(kind=8), intent(in out) :: valbig(nvar,mx,my)
-    real(kind=8), intent(in out) :: aux(naux,mx,my)
+    real(CLAW_REAL), intent(in out) :: valbig(nvar,mx,my)
+    real(CLAW_REAL), intent(in out) :: aux(naux,mx,my)
 
     ! Local storage
     integer  :: iplo, iphi, jplo, jphi
@@ -43,15 +43,15 @@ recursive subroutine filrecur(level,nvar,valbig,aux,naux,t,mx,my, &
     integer :: mx_coarse, my_coarse, mx_patch, my_patch
     integer :: unset_indices(4), coarse_indices(4)
     integer :: refinement_ratio_x, refinement_ratio_y
-    real(kind=8) :: dx_fine, dy_fine, dx_coarse, dy_coarse
-    real(kind=8) :: xlow_coarse,ylow_coarse, xlow_fine, ylow_fine, xhi_fine,yhi_fine   
-    real(kind=8) :: h, b, eta_fine, eta1, eta2, up_slope, down_slope
-    real(kind=8) :: hv_fine, v_fine, v_new, divide_mass
-    real(kind=8) :: h_fine_average, h_fine, h_count, h_coarse
-    real(kind=8)::  xcent_fine,xcent_coarse,ycent_fine,ycent_coarse,ratio_x,ratio_y
+    real(CLAW_REAL) :: dx_fine, dy_fine, dx_coarse, dy_coarse
+    real(CLAW_REAL) :: xlow_coarse,ylow_coarse, xlow_fine, ylow_fine, xhi_fine,yhi_fine   
+    real(CLAW_REAL) :: h, b, eta_fine, eta1, eta2, up_slope, down_slope
+    real(CLAW_REAL) :: hv_fine, v_fine, v_new, divide_mass
+    real(CLAW_REAL) :: h_fine_average, h_fine, h_count, h_coarse
+    real(CLAW_REAL)::  xcent_fine,xcent_coarse,ycent_fine,ycent_coarse,ratio_x,ratio_y
     integer(kind=1) :: flaguse(ihi-ilo+1, jhi-jlo+1)
 
-    real(kind=8) :: eta1old, eta2old
+    real(CLAW_REAL) :: eta1old, eta2old
 
     ! Scratch arrays for interpolation
     logical :: fine_flag(nvar, ihi-ilo+2,jhi-jlo + 2)
@@ -60,11 +60,11 @@ recursive subroutine filrecur(level,nvar,valbig,aux,naux,t,mx,my, &
 
 
     ! these are dimensioned at fine size since coarse grid size cant be larger (incl. the +3 that is )
-    real(kind=8) ::  fine_mass(ihi-ilo + 3, jhi-jlo + 3)
-    real(kind=8) :: eta_coarse(ihi-ilo + 3, jhi-jlo + 3)
-    real(kind=8) ::    vel_max(ihi-ilo + 3, jhi-jlo + 3)
-    real(kind=8) ::    vel_min(ihi-ilo + 3, jhi-jlo + 3)
-    real(kind=8) ::   slope(2, ihi-ilo + 3, jhi-jlo + 3)
+    real(CLAW_REAL) ::  fine_mass(ihi-ilo + 3, jhi-jlo + 3)
+    real(CLAW_REAL) :: eta_coarse(ihi-ilo + 3, jhi-jlo + 3)
+    real(CLAW_REAL) ::    vel_max(ihi-ilo + 3, jhi-jlo + 3)
+    real(CLAW_REAL) ::    vel_min(ihi-ilo + 3, jhi-jlo + 3)
+    real(CLAW_REAL) ::   slope(2, ihi-ilo + 3, jhi-jlo + 3)
     integer ::   fine_cell_count(ihi-ilo+3, jhi-jlo + 3)
 
     integer :: nghost_patch, lencrse
@@ -78,8 +78,8 @@ recursive subroutine filrecur(level,nvar,valbig,aux,naux,t,mx,my, &
     !  when pass it in to subroutines they treat it as having di_fineerent
     !  dimensions than the max size need to allocate here
     ! the +2 is to expand on coarse grid to enclose fine
-    real(kind=8) :: valcrse((ihi-ilo+3) * (jhi-jlo+3) * nvar)   ! NB this is a 1D array 
-    real(kind=8) :: auxcrse((ihi-ilo+3) * (jhi-jlo+3) * naux)  
+    real(CLAW_REAL) :: valcrse((ihi-ilo+3) * (jhi-jlo+3) * nvar)   ! NB this is a 1D array 
+    real(CLAW_REAL) :: auxcrse((ihi-ilo+3) * (jhi-jlo+3) * naux)  
  
 
     mx_patch = ihi-ilo + 1 ! nrowp
@@ -252,8 +252,8 @@ recursive subroutine filrecur(level,nvar,valbig,aux,naux,t,mx,my, &
             enddo
         enddo
 
-        ratio_y = real(refinement_ratio_y,kind=8)  ! needs to be real for "floor" call below
-        ratio_x = real(refinement_ratio_x,kind=8)
+        ratio_y = real(refinement_ratio_y,kind=CLAW_REAL)  ! needs to be real for "floor" call below
+        ratio_x = real(refinement_ratio_x,kind=CLAW_REAL)
         ! Loop through patch to be filled, includes multiple coarse cells
          do j_fine = 1, my_patch
             j_coarse     = floor((j_fine + jlo - 1) / ratio_y) - jplo + 1
@@ -263,8 +263,8 @@ recursive subroutine filrecur(level,nvar,valbig,aux,naux,t,mx,my, &
             if (abs(eta2) .gt. .5d0) then
                 write(*,*)" filpatch y indexing error: eta2 = ",eta2
             endif
-            !eta2old = (-0.5d0 + real(mod(j_fine - 1, refinement_ratio_y),kind=8)) &
-            !                        / real(refinement_ratio_y,kind=8)
+            !eta2old = (-0.5d0 + real(mod(j_fine - 1, refinement_ratio_y),kind=CLAW_REAL)) &
+            !                        / real(refinement_ratio_y,kind=CLAW_REAL)
             do i_fine = 1, mx_patch
                 i_coarse     = floor((i_fine+ilo-1) / ratio_x) - iplo + 1
                 xcent_coarse = xlow_coarse + (i_coarse-.5d0)*dx_coarse
@@ -273,8 +273,8 @@ recursive subroutine filrecur(level,nvar,valbig,aux,naux,t,mx,my, &
                 if (abs(eta1) .gt. .5d0) then
                    write(*,*)" filpatch x indexing error: eta1 = ",eta1
                 endif
-                !eta1old = (-0.5d0 + real(mod(i_fine - 1, refinement_ratio_x),kind=8)) &
-                !                / real(refinement_ratio_x,kind=8)
+                !eta1old = (-0.5d0 + real(mod(i_fine - 1, refinement_ratio_x),kind=CLAW_REAL)) &
+                !                / real(refinement_ratio_x,kind=CLAW_REAL)
 
                 if (flaguse(i_fine,j_fine) == 0) then
                     ! Interpolate from coarse cells to fine grid for surface
@@ -407,7 +407,7 @@ recursive subroutine filrecur(level,nvar,valbig,aux,naux,t,mx,my, &
                             if (fine_flag(1,i_coarse,j_coarse) .or. fine_flag(n,i_coarse,j_coarse)) then
                                 if (fine_mass(i_coarse,j_coarse) > dry_tolerance) then
                                     h_coarse = valcrse(ivalc(1,i_coarse,j_coarse))
-                                    h_count = real(fine_cell_count(i_coarse,j_coarse),kind=8)
+                                    h_count = real(fine_cell_count(i_coarse,j_coarse),kind=CLAW_REAL)
                                     h_fine_average = fine_mass(i_coarse,j_coarse) / h_count
                                     divide_mass = max(h_coarse, h_fine_average)
                                     h_fine = valbig(1, i_fine + nrowst - 1, j_fine + ncolst - 1)

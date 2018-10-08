@@ -21,37 +21,37 @@ module holland_storm_module
 
         ! Location of storm
         ! Track is a triplet with (time,longitude,latitude)
-        real(kind=8), allocatable :: track(:,:)
+        real(CLAW_REAL), allocatable :: track(:,:)
 
         ! Storm parameterization
-        real(kind=8), allocatable :: max_wind_radius(:)
-        real(kind=8), allocatable :: max_wind_speed(:)
-        real(kind=8), allocatable :: central_pressure(:)
-        real(kind=8), allocatable :: rrp(:)
+        real(CLAW_REAL), allocatable :: max_wind_radius(:)
+        real(CLAW_REAL), allocatable :: max_wind_speed(:)
+        real(CLAW_REAL), allocatable :: central_pressure(:)
+        real(CLAW_REAL), allocatable :: rrp(:)
 
         ! Approximate velocity of storm, approximated via the track points
         ! using a first order difference on the sphere
-        real(kind=8), allocatable :: velocity(:,:)
+        real(CLAW_REAL), allocatable :: velocity(:,:)
 
     end type holland_storm_type
 
     logical, private :: module_setup = .false.
 
     ! Interal tracking variables for storm
-    real(kind=8), private :: A,B
+    real(CLAW_REAL), private :: A,B
     integer, private :: last_storm_index
 
     logical, private :: debug_flag = .false. 
 
     ! Atmospheric boundary layer, input variable in ADCIRC but always is
     ! set to the following value
-    real(kind=8), parameter :: atmos_boundary_layer = 0.9d0
+    real(CLAW_REAL), parameter :: atmos_boundary_layer = 0.9d0
 
     ! Sampling adjustment from 1 min to 10 min winds
-    real(kind=8), parameter :: sampling_time = 0.88d0 
+    real(CLAW_REAL), parameter :: sampling_time = 0.88d0 
 
     ! Storm field ramping width - Represents crudely the ramping radial area
-    real(kind=8), parameter :: RAMP_WIDTH = 100.0d3
+    real(CLAW_REAL), parameter :: RAMP_WIDTH = 100.0d3
 
 contains
 
@@ -71,7 +71,7 @@ contains
         ! Local storage
         integer, parameter :: data_file = 701
         integer :: i, k, io_status, num_casts
-        real(kind=8) :: forecast_time,last_time,x(2),y(2),ds,dt,dx,dy,theta
+        real(CLAW_REAL) :: forecast_time,last_time,x(2),y(2),ds,dt,dx,dy,theta
 
         ! Reading buffer variables
         integer :: year,month,day,hour,forecast,lat,lon,max_wind_speed
@@ -134,7 +134,7 @@ contains
                 if (io_status /= 0) exit
 
                 ! Skip counting this line if time is repeated
-                forecast_time = date_to_seconds(year,month,day,hour,0,0.d0)
+                forecast_time = date_to_seconds(year,month,day,hour,0,real(0.d0,CLAW_REAL))
                 if (abs(forecast_time - last_time) >= 1.8d3) then
                     num_casts = num_casts + 1
                 endif
@@ -168,7 +168,7 @@ contains
 
 
                 ! Skip counting this line if time is repeated
-                forecast_time = date_to_seconds(year,month,day,hour,0,0.d0)
+                forecast_time = date_to_seconds(year,month,day,hour,0,real(0.d0,CLAW_REAL))
                 if (abs(forecast_time - last_time) < 1.8d3) then
                     cycle
                 endif
@@ -179,16 +179,16 @@ contains
                 ! Conversions:
                 !  lon - Convert 10ths of degs to degs, depends on E,W
                 !  lat - Convert 10ths of degs to degs
-                storm%track(1,i) = date_to_seconds(year,month,day,hour,0,0.d0)
+                storm%track(1,i) = date_to_seconds(year,month,day,hour,0,real(0.d0,CLAW_REAL))
                 if (direction(1) == "E") then
-                    storm%track(2,i) = real(lon,kind=8) / 10.d0
+                    storm%track(2,i) = real(lon,kind=CLAW_REAL) / 10.d0
                 else
-                    storm%track(2,i) = -real(lon,kind=8) / 10.d0
+                    storm%track(2,i) = -real(lon,kind=CLAW_REAL) / 10.d0
                 endif
                 if (direction(2) == "N") then
-                    storm%track(3,i) = real(lat,kind=8) / 10.d0
+                    storm%track(3,i) = real(lat,kind=CLAW_REAL) / 10.d0
                 else
-                    storm%track(3,i) = -real(lat,kind=8) / 10.d0
+                    storm%track(3,i) = -real(lat,kind=CLAW_REAL) / 10.d0
                 endif
 
                 ! Storm intensity
@@ -197,10 +197,10 @@ contains
                 !  max_wind_radius  - convert from nm to m
                 !  central_pressure - convert from mbar to Pa
                 !  Radius of last isobar contour - convert from nm to m
-                storm%max_wind_speed(i) = real(max_wind_speed,kind=8) * 0.51444444d0
-                storm%max_wind_radius(i) = real(max_wind_radius,kind=8) * 1.852000003180799d0 * 1000.d0
-                storm%central_pressure(i) = real(central_pressure,kind=8) * 100.d0
-                storm%rrp(i) = real(RRP,kind=8) * 1.852000003180799d0 * 1000.d0
+                storm%max_wind_speed(i) = real(max_wind_speed,kind=CLAW_REAL) * 0.51444444d0
+                storm%max_wind_radius(i) = real(max_wind_radius,kind=CLAW_REAL) * 1.852000003180799d0 * 1000.d0
+                storm%central_pressure(i) = real(central_pressure,kind=CLAW_REAL) * 100.d0
+                storm%rrp(i) = real(RRP,kind=CLAW_REAL) * 1.852000003180799d0 * 1000.d0
 
             enddo
 
@@ -215,13 +215,23 @@ contains
 
                 dt = storm%track(1,i + 1) - storm%track(1,i)
 
+#if (CLAW_REAL == 8)
                 ds = spherical_distance(x(1), 0.5d0 * (x(2) + y(2)), &
                                         y(1), 0.5d0 * (x(2) + y(2)))
+#else
+                ds = spherical_distance(x(1), 0.50 * (x(2) + y(2)), &
+                                        y(1), 0.50 * (x(2) + y(2)))
+#endif
                 storm%velocity(1,i) = sign(ds / dt,y(1) - x(1))
 
                 
+#if (CLAW_REAL == 8)
                 ds = spherical_distance(0.5d0 * (x(1) + y(1)), x(2), &
                                         0.5d0 * (x(1) + y(1)), y(2))
+#else
+                ds = spherical_distance(0.5 * (x(1) + y(1)), x(2), &
+                                        0.5 * (x(1) + y(1)), y(2))
+#endif
                 storm%velocity(2,i) = sign(ds / dt,y(2) - x(2))
             end do
 
@@ -264,18 +274,18 @@ contains
 
 
     ! ==========================================================================
-    !  real(kind=8) pure date_to_seconds(year,months,days,hours,minutes,seconds)
+    !  real(CLAW_REAL) pure date_to_seconds(year,months,days,hours,minutes,seconds)
     !    Convert time from year, month, day, hour, min, sec to seconds since the
     !    beginning of the year.
     ! ==========================================================================
-    pure real(kind=8) function date_to_seconds(year,months,days,hours,minutes, &
+    pure real(CLAW_REAL) function date_to_seconds(year,months,days,hours,minutes, &
                                                seconds) result(time)
       
         implicit none
 
         ! Input
         integer, intent(in) :: year, months, days, hours, minutes
-        real(kind=8), intent(in) :: seconds
+        real(CLAW_REAL), intent(in) :: seconds
 
         ! Local storage
         integer :: total_days
@@ -303,7 +313,7 @@ contains
         if (months > 11) total_days = total_days + 30
 
         ! Convert everything to seconds since the beginning of the year
-        time = real((total_days - 1) * 86400 + hours * 3600 + minutes * 60,kind=8)
+        time = real((total_days - 1) * 86400 + hours * 3600 + minutes * 60,kind=CLAW_REAL)
         time = time + seconds
 
     end function date_to_seconds
@@ -318,14 +328,14 @@ contains
         implicit none
 
         ! Input
-        real(kind=8), intent(in) :: t
+        real(CLAW_REAL), intent(in) :: t
         type(holland_storm_type), intent(in out) :: storm
 
         ! Output
-        real(kind=8) :: location(2)
+        real(CLAW_REAL) :: location(2)
 
         ! Junk storage
-        real(kind=8) :: junk(2)
+        real(CLAW_REAL) :: junk(2)
 
         call get_holland_storm_data(t, storm, location, junk, junk(1),        &
                                     junk(1), junk(1), junk(1))
@@ -336,16 +346,16 @@ contains
     !  holland_storm_direction
     !   Angle off of due north that the storm is traveling
     ! ==========================================================================
-    real(kind=8) function holland_storm_direction(t, storm) result(theta)
+    real(CLAW_REAL) function holland_storm_direction(t, storm) result(theta)
 
         implicit none
 
         ! Input
-        real(kind=8), intent(in) :: t
+        real(CLAW_REAL), intent(in) :: t
         type(holland_storm_type), intent(in) :: storm
 
         ! Locals
-        real(kind=8) :: junk(2), velocity(2)
+        real(CLAW_REAL) :: junk(2), velocity(2)
 
         ! Fetch velocity of storm which has direction encoded in it
         call get_holland_storm_data(t, storm, junk, velocity, junk(1),  &
@@ -365,11 +375,11 @@ contains
         implicit none
 
         ! Input
-        real(kind=8), intent(in) :: t
+        real(CLAW_REAL), intent(in) :: t
         type(holland_storm_type), intent(in) :: storm
 
         ! Locals
-        real(kind=8) :: t0,t1
+        real(CLAW_REAL) :: t0,t1
         logical :: found
 
         ! Figure out where we are relative to the last time we checked for the
@@ -424,16 +434,16 @@ contains
         implicit none
 
         ! Input
-        real(kind=8), intent(in) :: t                       ! Current time
+        real(CLAW_REAL), intent(in) :: t                       ! Current time
         type(holland_storm_type), intent(in) :: storm   ! Storm
 
         ! Output
-        real(kind=8), intent(out) :: location(2), velocity(2)
-        real(kind=8), intent(out) :: max_wind_radius, max_wind_speed
-        real(kind=8), intent(out) :: central_pressure, rrp
+        real(CLAW_REAL), intent(out) :: location(2), velocity(2)
+        real(CLAW_REAL), intent(out) :: max_wind_radius, max_wind_speed
+        real(CLAW_REAL), intent(out) :: central_pressure, rrp
 
         ! Local
-        real(kind=8) :: fn(8), fnm(8), weight, tn, tnm, x(2)
+        real(CLAW_REAL) :: fn(8), fnm(8), weight, tn, tnm, x(2)
         integer :: i
 
         ! Increment storm data index if needed and not at end of forecast
@@ -513,7 +523,7 @@ contains
 
         ! Time of the wind field requested
         integer, intent(in) :: maux,mbc,mx,my
-        real(kind=8), intent(in) :: xlower,ylower,dx,dy,t
+        real(CLAW_REAL), intent(in) :: xlower,ylower,dx,dy,t
 
         ! Storm description, need in out here since we may update the storm
         ! if at next time point
@@ -521,12 +531,12 @@ contains
 
         ! Array storing wind and presure field
         integer, intent(in) :: wind_index, pressure_index
-        real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+        real(CLAW_REAL), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
         ! Local storage
-        real(kind=8) :: x, y, r, theta, sloc(2)
-        real(kind=8) :: f, mwr, mws, Pc, Pa, dp, wind, tv(2), rrp
-        real(kind=8) :: mod_mws, trans_speed, ramp
+        real(CLAW_REAL) :: x, y, r, theta, sloc(2)
+        real(CLAW_REAL) :: f, mwr, mws, Pc, Pa, dp, wind, tv(2), rrp
+        real(CLAW_REAL) :: mod_mws, trans_speed, ramp
         integer :: i,j
 
         ! Get interpolated storm data

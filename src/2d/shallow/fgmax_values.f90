@@ -25,14 +25,14 @@ subroutine fgmax_values(mx,my,meqn,mbc,maux,q,aux,dx,dy, &
 
     implicit none
     integer, intent(in) :: mx,my,meqn,mbc,maux
-    real(kind=8), intent(in) :: q(meqn, 1-mbc:mx+mbc, 1-mbc:my+mbc)
-    real(kind=8), intent(in) :: aux(maux, 1-mbc:mx+mbc, 1-mbc:my+mbc)
-    real(kind=8), intent(in) :: dx,dy,xlower,ylower
+    real(CLAW_REAL), intent(in) :: q(meqn, 1-mbc:mx+mbc, 1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: aux(maux, 1-mbc:mx+mbc, 1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: dx,dy,xlower,ylower
     logical, intent(in) :: mask_patch(1-mbc:mx+mbc, 1-mbc:my+mbc)
-    real(kind=8), intent(inout) :: values(FG_NUM_VAL, 1-mbc:mx+mbc, 1-mbc:my+mbc)
+    real(CLAW_REAL), intent(inout) :: values(FG_NUM_VAL, 1-mbc:mx+mbc, 1-mbc:my+mbc)
 
-    real(kind=8) :: s,hs,hss,s_dry_tol
-    real(kind=8), dimension(:,:), allocatable :: u,v,h
+    real(CLAW_REAL) :: s,hs,hss,s_dry_tol
+    real(CLAW_REAL), dimension(:,:), allocatable :: u,v,h
 
     allocate(h(1-mbc:mx+mbc, 1-mbc:my+mbc))
     if (FG_NUM_VAL > 1) then

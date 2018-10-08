@@ -17,14 +17,14 @@ module multilayer_module
     
     ! Physical parameters
     integer :: num_layers
-    real(kind=8), allocatable :: eta_init(:)
-    real(kind=8) :: r, one_minus_r
+    real(CLAW_REAL), allocatable :: eta_init(:)
+    real(CLAW_REAL) :: r, one_minus_r
     
     ! Algorithm parameters
     integer :: eigen_method,inundation_method
     logical :: check_richardson
-    real(kind=8) :: richardson_tolerance
-    real(kind=8), allocatable :: wave_tol(:), dry_tolerance(:)
+    real(CLAW_REAL) :: richardson_tolerance
+    real(CLAW_REAL), allocatable :: wave_tol(:), dry_tolerance(:)
     
     ! Output files
     integer, parameter :: KAPPA_UNIT = 42
@@ -34,9 +34,9 @@ module multilayer_module
         subroutine eigen_function(h_l, h_r, u_l, u_r, v_l, v_r,                &
                                             n_index, t_index, s, eig_vec)
             implicit none
-            real(kind=8), dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
+            real(CLAW_REAL), dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
             integer, intent(in) :: n_index,t_index
-            real(kind=8), intent(inout) :: s(6),eig_vec(6,6)
+            real(CLAW_REAL), intent(inout) :: s(6),eig_vec(6,6)
         end subroutine eigen_function
     end interface
 
@@ -170,14 +170,14 @@ contains
         implicit none
         
         ! Input
-        double precision, dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
+        real(CLAW_REAL), dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
         integer, intent(in) :: n_index,t_index
         
         ! Output
-        double precision, intent(inout) :: s(6),eig_vec(6,6)
+        real(CLAW_REAL), intent(inout) :: s(6),eig_vec(6,6)
             
         ! Local
-        double precision :: gamma_l,gamma_r,alpha(4),g
+        real(CLAW_REAL) :: gamma_l,gamma_r,alpha(4),g
         
         g = grav
             
@@ -223,14 +223,14 @@ contains
         implicit none
         
         ! Input
-        double precision, dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
+        real(CLAW_REAL), dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
         integer, intent(in) :: n_index,t_index
         
         ! Output
-        double precision, intent(inout) :: s(6),eig_vec(6,6)
+        real(CLAW_REAL), intent(inout) :: s(6),eig_vec(6,6)
             
         ! Local
-        double precision :: total_depth_l,total_depth_r,mult_depth_l,mult_depth_r
+        real(CLAW_REAL) :: total_depth_l,total_depth_r,mult_depth_l,mult_depth_r
         
         total_depth_l = sum(h_l)
         total_depth_r = sum(h_r)
@@ -264,18 +264,18 @@ contains
         implicit none
         
         ! Input
-        double precision, dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
+        real(CLAW_REAL), dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
         integer, intent(in) :: n_index,t_index
         
         ! Output
-        double precision, intent(inout) :: s(6),eig_vec(6,6)
+        real(CLAW_REAL), intent(inout) :: s(6),eig_vec(6,6)
         
         ! Local
         integer, parameter :: lwork = 6*6
         integer :: i,j,m,info
-        double precision :: h_ave(2),u_ave(2),v_ave(2),A(6,6),A_copy(6,6)
-        double precision :: imag_evalues(6),empty,work(1,lwork)
-        double precision :: g
+        real(CLAW_REAL) :: h_ave(2),u_ave(2),v_ave(2),A(6,6),A_copy(6,6)
+        real(CLAW_REAL) :: imag_evalues(6),empty,work(1,lwork)
+        real(CLAW_REAL) :: g
         
         g = grav
 
@@ -340,11 +340,11 @@ contains
         implicit none
         
         ! Input
-        double precision, dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
+        real(CLAW_REAL), dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
         integer, intent(in) :: n_index,t_index
         
         ! Output
-        double precision, intent(inout) :: s(6),eig_vec(6,6)
+        real(CLAW_REAL), intent(inout) :: s(6),eig_vec(6,6)
   
         stop "LAPACK eigensolver was not available at build time."
 
@@ -364,11 +364,11 @@ contains
         implicit none
         
         ! Input
-        double precision, dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
+        real(CLAW_REAL), dimension(2), intent(in) :: h_l,h_r,u_l,u_r,v_l,v_r
         integer, intent(in) :: n_index,t_index
         
         ! Output
-        double precision, intent(inout) :: s(6),eig_vec(6,6)
+        real(CLAW_REAL), intent(inout) :: s(6),eig_vec(6,6)
 
         s = 0.d0
         s(1) = u_l(1) - sqrt(grav*h_l(1))

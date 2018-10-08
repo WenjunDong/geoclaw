@@ -6,18 +6,18 @@ module fixedgrids_module
     ! Container for fixed grid data, geometry and output settings
     type fixedgrid_type
         ! Grid data
-        real(kind=8), pointer :: early(:,:,:)
-        real(kind=8), pointer :: late(:,:,:)
-        real(kind=8), pointer :: often(:,:,:)
+        real(CLAW_REAL), pointer :: early(:,:,:)
+        real(CLAW_REAL), pointer :: late(:,:,:)
+        real(CLAW_REAL), pointer :: often(:,:,:)
         
         ! Geometry
         integer :: num_vars(2),mx,my
-        real(kind=8) :: dx,dy,x_low,x_hi,y_low,y_hi
+        real(CLAW_REAL) :: dx,dy,x_low,x_hi,y_low,y_hi
         
         ! Time Tracking and output types
         integer :: num_output,last_output_index
         integer :: output_arrival_times,output_surface_max
-        real(kind=8) :: last_output_time,start_time,end_time,dt
+        real(CLAW_REAL) :: last_output_time,start_time,end_time,dt
     end type fixedgrid_type    
 
 
@@ -26,7 +26,7 @@ module fixedgrids_module
     ! Fixed grid arrays and sizes
     integer :: num_fixed_grids
     type(fixedgrid_type), allocatable :: fgrids(:)
-    real(kind=8) :: tcfmax
+    real(CLAW_REAL) :: tcfmax
 
 contains
     
@@ -171,9 +171,9 @@ contains
         integer, intent(in) :: fgrid_type
         type(fixedgrid_type), intent(inout) :: fgrid
         integer, intent(in) :: meqn,mxc,myc,mbc,maux,maxcheck
-        real(kind=8), intent(in) :: t,dxc,dyc,xlowc,ylowc
-        real(kind=8), intent(in) :: q(meqn,1-mbc:mxc+mbc,1-mbc:myc+mbc)
-        real(kind=8), intent(in) :: aux(maux,1-mbc:mxc+mbc,1-mbc:myc+mbc)
+        real(CLAW_REAL), intent(in) :: t,dxc,dyc,xlowc,ylowc
+        real(CLAW_REAL), intent(in) :: q(meqn,1-mbc:mxc+mbc,1-mbc:myc+mbc)
+        real(CLAW_REAL), intent(in) :: aux(maux,1-mbc:mxc+mbc,1-mbc:myc+mbc)
     
         ! Indices
         integer :: ifg,jfg,m,ic1,ic2,jc1,jc2
@@ -181,20 +181,20 @@ contains
         integer :: eta_min_index,eta_max_index,eta_now_index
 
         ! Tolerances
-        real(kind=8), parameter :: arrival_tolerance = 1.d-2
-        real(kind=8) :: total_depth,depth_indicator,nan_check
+        real(CLAW_REAL), parameter :: arrival_tolerance = 1.d-2
+        real(CLAW_REAL) :: total_depth,depth_indicator,nan_check
 
         ! Geometry
-        real(kind=8) :: xfg,yfg,xc1,xc2,yc1,yc2,xhic,yhic
-        real(kind=8) :: geometry(4)
+        real(CLAW_REAL) :: xfg,yfg,xc1,xc2,yc1,yc2,xhic,yhic
+        real(CLAW_REAL) :: geometry(4)
         
         ! Work arrays for eta interpolation
-        real(kind=8) :: eta(2,2),h(2,2)
+        real(CLAW_REAL) :: eta(2,2),h(2,2)
         
         
         ! Alias to data in fixed grid
         integer :: num_vars
-        real(kind=8), pointer :: fg_data(:,:,:)
+        real(CLAW_REAL), pointer :: fg_data(:,:,:)
         
         ! Setup aliases for specific fixed grid
         if (fgrid_type == 1) then
@@ -370,7 +370,7 @@ contains
         
         ! Subroutine arguments
         type(fixedgrid_type), intent(inout) :: fgrid
-        real(kind=8), intent(in) :: out_time
+        real(CLAW_REAL), intent(in) :: out_time
         integer, intent(in) :: grid_index,out_index, out_flag
               
         ! I/O
@@ -400,7 +400,7 @@ contains
         ! Other locals
         integer :: i,j,m
         integer :: eta_min_index,eta_max_index
-        real(kind=8) :: t0,tf,tau
+        real(CLAW_REAL) :: t0,tf,tau
     
 
         ! Make the file names and open output files
@@ -510,8 +510,8 @@ contains
     ! =========================================================================
     ! Utility functions for this module
     ! Returns back a NaN
-    real(kind=8) function nan()
-        real(kind=8) dnan
+    real(CLAW_REAL) function nan()
+        real(CLAW_REAL) dnan
         integer inan(2)
         equivalence (dnan,inan)
         inan(1)=2147483647
@@ -521,13 +521,13 @@ contains
     
     ! Interpolation function (in space)
     ! Given 4 points (points) and geometry from x,y,and cross terms
-    real(kind=8) pure function interpolate(points,geometry) result(interpolant)
+    real(CLAW_REAL) pure function interpolate(points,geometry) result(interpolant)
                             
         implicit none
                                 
         ! Function signature
-        real(kind=8), intent(in) :: points(2,2)
-        real(kind=8), intent(in) :: geometry(4)
+        real(CLAW_REAL), intent(in) :: points(2,2)
+        real(CLAW_REAL), intent(in) :: geometry(4)
         
         ! This is set up as a dot product between the approrpriate terms in 
         ! the input data.  This routine could be vectorized or a BLAS routine
@@ -547,10 +547,10 @@ contains
         
         ! Input arguments
         integer, intent(in) :: num_vars
-        real(kind=8), intent(in) :: early(num_vars),late(num_vars),tau
+        real(CLAW_REAL), intent(in) :: early(num_vars),late(num_vars),tau
         
         ! Return value
-        real(kind=8) :: interpolant(num_vars)
+        real(CLAW_REAL) :: interpolant(num_vars)
 
         interpolant = (1.d0 - tau) * early(:) + tau * late(:)
 

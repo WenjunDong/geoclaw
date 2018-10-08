@@ -13,7 +13,7 @@ c     !use gauges_module, only: OUTGAUGEUNIT, num_gauges
       use gauges_module, only: print_gauges_and_reset_nextLoc
       use fgmax_module
 
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
       integer tchkunit, ifg, ii
       parameter (tchkunit = 13)
       character  chkname*13

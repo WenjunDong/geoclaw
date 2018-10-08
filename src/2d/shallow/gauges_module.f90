@@ -56,21 +56,21 @@ module gauges_module
         character(len=14) :: file_name
 
         ! Location in time and space
-        real(kind=8) :: x, y, t_start, t_end
+        real(CLAW_REAL) :: x, y, t_start, t_end
 
         ! Last time recorded
-        real(kind=8) :: last_time
+        real(CLAW_REAL) :: last_time
 
         ! Output settings
         integer :: file_format
-        real(kind=8) :: min_time_increment
+        real(CLAW_REAL) :: min_time_increment
         character(len=10) :: display_format
         logical, allocatable :: q_out_vars(:)
         logical, allocatable :: aux_out_vars(:)
         integer :: num_out_vars
 
         ! Data buffers - data holds output and time
-        real(kind=8), allocatable :: data(:, :)
+        real(CLAW_REAL), allocatable :: data(:, :)
         integer :: level(MAX_BUFFER)
 
         ! Where we are in the buffer
@@ -369,16 +369,16 @@ contains
 
         ! Input
         integer, intent(in) ::  num_eqn, mitot, mjtot, num_aux, mptr
-        real(kind=8), intent(in) :: q(num_eqn, mitot, mjtot)
-        real(kind=8), intent(in) :: aux(num_aux, mitot, mjtot)
-        real(kind=8), intent(in) :: xlow, ylow
+        real(CLAW_REAL), intent(in) :: q(num_eqn, mitot, mjtot)
+        real(CLAW_REAL), intent(in) :: aux(num_aux, mitot, mjtot)
+        real(CLAW_REAL), intent(in) :: xlow, ylow
 
         ! Locals
-        real(kind=8) :: var(maxvar + maxaux)
-        real(kind=8) :: xcent, ycent, xoff, yoff, tgrid, hx, hy
+        real(CLAW_REAL) :: var(maxvar + maxaux)
+        real(CLAW_REAL) :: xcent, ycent, xoff, yoff, tgrid, hx, hy
         integer :: level, i1, i2, icell, jcell, ii, iindex, jindex
         integer :: i, j, n, var_index, eta_index
-        real(kind=8) :: h(4), mod_dry_tolerance, topo, h_interp
+        real(CLAW_REAL) :: h(4), mod_dry_tolerance, topo, h_interp
 
         ! No gauges to record, exit
         if (num_gauges == 0) then

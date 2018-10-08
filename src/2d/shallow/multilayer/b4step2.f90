@@ -32,14 +32,14 @@ subroutine b4step2(mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux)
     
     ! Subroutine arguments
     integer, intent(in) :: mbc,mx,my,meqn,maux
-    real(kind=8), intent(in) :: xlower, ylower, dx, dy, t, dt
-    real(kind=8), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-    real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: xlower, ylower, dx, dy, t, dt
+    real(CLAW_REAL), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
     ! Local storage
     integer :: index,i,j,k
-    real(kind=8) :: h(num_layers),u(num_layers),v(num_layers)
-    real(kind=8) :: kappa,one_minus_r
+    real(CLAW_REAL) :: h(num_layers),u(num_layers),v(num_layers)
+    real(CLAW_REAL) :: kappa,one_minus_r
     logical :: dry_state(num_layers)
 
     ! Format strings

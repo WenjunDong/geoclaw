@@ -16,26 +16,26 @@ module fgmax_module
 
         ! fixed grid points are (x(k),y(k)), for k=1:npts
         integer :: npts
-        real(kind=8), allocatable, dimension(:) :: x,y
+        real(CLAW_REAL), allocatable, dimension(:) :: x,y
 
         ! arrays valuemax(mv,k), aux(level,ma,k), levelmax(k)
         ! where mv = 1:num_values  # number of quantities monitored
         !       ma = 1:num_aux
         !        k = 1:npts
-        real(kind=8), allocatable, dimension(:,:,:) :: aux
-        real(kind=8), allocatable, dimension(:,:) :: valuemax
-        real(kind=8), allocatable, dimension(:,:) :: tmax
-        real(kind=8), allocatable, dimension(:) :: t_last_updated
-        real(kind=8), allocatable, dimension(:) :: arrival_time
+        real(CLAW_REAL), allocatable, dimension(:,:,:) :: aux
+        real(CLAW_REAL), allocatable, dimension(:,:) :: valuemax
+        real(CLAW_REAL), allocatable, dimension(:,:) :: tmax
+        real(CLAW_REAL), allocatable, dimension(:) :: t_last_updated
+        real(CLAW_REAL), allocatable, dimension(:) :: arrival_time
         integer, allocatable, dimension(:) :: levelmax
 
         ! time range to monitor:
-        real(kind=8) :: tstart_max, tend_max
+        real(CLAW_REAL) :: tstart_max, tend_max
 
         ! Desired maximum delta t between updating valuemax:
         ! Will only update at start of time step if end of timestep is
         ! to far beyond last update time
-        real(kind=8) :: dt_check
+        real(CLAW_REAL) :: dt_check
 
         ! Mininum level to check when updating valuemax or arrival times:
         ! Coarser levels will be ignored to avoid bad data from coarse grids
@@ -43,12 +43,12 @@ module fgmax_module
 
         ! Tolerance for flagging point for arrival of tsunami.
         ! Flag in fgmax_frompatch if eta tilde > sea_level + arrival_tol
-        real(kind=8) :: arrival_tol
+        real(CLAW_REAL) :: arrival_tol
 
 
         ! Coordinates of corners of bounding box.
         ! This will be useful when generalizing to fgrids not aligned with x-y.
-        real(kind=8) :: x1bb,x2bb,y1bb,y2bb
+        real(CLAW_REAL) :: x1bb,x2bb,y1bb,y2bb
 
         ! keep track of whether all aux arrays have been computed on a given level:
         logical, allocatable, dimension(:) :: auxdone
@@ -63,7 +63,11 @@ module fgmax_module
     type(fgrid), target :: FG_fgrids(FG_MAXNUM_FGRIDS)
 
     ! special value to flag unset portions of arrays:
-    real(kind=8), parameter :: FG_NOTSET = -0.99999d99
+#if (CLAW_REAL == 8)
+    real(CLAW_REAL), parameter :: FG_NOTSET = -0.99999d99
+#else
+    real(CLAW_REAL), parameter :: FG_NOTSET = -0.99999e99
+#endif
 
     ! unit to use for reading input data and writing fgrid results:
     integer, parameter :: FG_UNIT = 45

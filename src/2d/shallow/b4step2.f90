@@ -30,13 +30,13 @@ subroutine b4step2(mbc,mx,my,meqn,q,xlower,ylower,dx,dy,t,dt,maux,aux)
     ! Subroutine arguments
     integer, intent(in) :: meqn
     integer, intent(inout) :: mbc,mx,my,maux
-    real(kind=8), intent(inout) :: xlower, ylower, dx, dy, t, dt
-    real(kind=8), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-    real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(inout) :: xlower, ylower, dx, dy, t, dt
+    real(CLAW_REAL), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
     ! Local storage
     integer :: index,i,j,k,dummy
-    real(kind=8) :: h,u,v
+    real(CLAW_REAL) :: h,u,v
 
     ! Check for NaNs in the solution
     call check4nans(meqn,mbc,mx,my,q,t,1)

@@ -39,8 +39,8 @@ subroutine fgmax_read(fname,ifg)
     character(150), intent(in) :: fname
     integer, intent(in) :: ifg 
     integer :: k,i,j,point_style,nx,ny,n12,n23
-    real(kind=8) :: x1,x2,y1,y2,yj
-    real(kind=8) :: x3,x4,y3,y4,x14,y14,x23,y23,xi,eta
+    real(CLAW_REAL) :: x1,x2,y1,y2,yj
+    real(CLAW_REAL) :: x3,x4,y3,y4,x14,y14,x23,y23,xi,eta
     type(fgrid), pointer :: fg
     logical :: foundFile
 

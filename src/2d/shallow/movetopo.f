@@ -26,7 +26,7 @@ c
       use topo_module, only: topoID
 
 
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
       dimension aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
       dimension dtopo(mxdtopo,mydtopo,mtdtopo)
 

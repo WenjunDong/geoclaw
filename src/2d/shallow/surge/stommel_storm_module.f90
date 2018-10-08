@@ -19,7 +19,7 @@ module stommel_storm_module
     ! Holland storm type definition
     type stommel_storm_type
 
-        real(kind=8) :: A
+        real(CLAW_REAL) :: A
 
     end type stommel_storm_type
 
@@ -83,7 +83,7 @@ contains
 
         ! Time of the wind field requested
         integer, intent(in) :: maux,mbc,mx,my
-        real(kind=8), intent(in) :: xlower,ylower,dx,dy,t
+        real(CLAW_REAL), intent(in) :: xlower,ylower,dx,dy,t
 
         ! Storm description, need in out here since we may update the storm
         ! if at next time point
@@ -91,11 +91,11 @@ contains
 
         ! Array storing wind and presure field
         integer, intent(in) :: wind_index, pressure_index
-        real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+        real(CLAW_REAL), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
         ! Locals
         integer :: j
-        real(kind=8) :: y, L
+        real(CLAW_REAL) :: y, L
 
         ! Domain size
         L = yupper_domain - ylower_domain

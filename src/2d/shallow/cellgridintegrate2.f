@@ -9,7 +9,7 @@ c *** Note: xcell and ycell are no longer needed -- should be removed.
 
       use topo_module, only: rectintegral, intersection
 
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
 
       dimension topo(mtoposize)
 

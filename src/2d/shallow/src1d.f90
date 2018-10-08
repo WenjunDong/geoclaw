@@ -21,19 +21,19 @@ subroutine src1d(meqn,mbc,mx1d,q1d,maux,aux1d,t,dt)
 
     ! Input
     integer, intent(in) :: meqn, mbc, mx1d, maux
-    real(kind=8), intent(in) :: t, dt
-    real(kind=8), intent(inout) :: q1d(meqn, mx1d), aux1d(maux, mx1d)
+    real(CLAW_REAL), intent(in) :: t, dt
+    real(CLAW_REAL), intent(inout) :: q1d(meqn, mx1d), aux1d(maux, mx1d)
 
     ! Local storage
     integer :: i, nman
     logical :: found
-    real(kind=8) :: h, hu, hv, gamma, dgamma, y, fdt, a(2,2), coeff, tau
-    real(kind=8) :: wind_speed, theta, P_atmos_x, P_atmos_y
+    real(CLAW_REAL) :: h, hu, hv, gamma, dgamma, y, fdt, a(2,2), coeff, tau
+    real(CLAW_REAL) :: wind_speed, theta, P_atmos_x, P_atmos_y
 
     ! Algorithm parameters
     ! Parameter controls when to zero out the momentum at a depth in the
     ! friction source term
-    real(kind=8), parameter :: depth_tolerance = 1.0d-30
+    real(CLAW_REAL), parameter :: depth_tolerance = 1.0d-30
     
     ! Friction forcing
     if (friction_forcing) then

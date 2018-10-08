@@ -4,7 +4,7 @@ c=========================================================================
 
       use amr_module
       use qinit_module
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
 
       character*150 fname
 

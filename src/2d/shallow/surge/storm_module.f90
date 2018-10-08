@@ -32,9 +32,9 @@ module storm_module
 
     ! Wind drag law support
     abstract interface
-        real(kind=8) pure function drag_function(speed, theta)
+        real(CLAW_REAL) pure function drag_function(speed, theta)
             implicit none
-            real(kind=8), intent(in) :: speed, theta
+            real(CLAW_REAL), intent(in) :: speed, theta
         end function drag_function
     end interface
         
@@ -42,18 +42,18 @@ module storm_module
     procedure (drag_function), pointer :: wind_drag
 
     ! AMR Parameters
-    real(kind=8), allocatable :: R_refine(:), wind_refine(:)
+    real(CLAW_REAL), allocatable :: R_refine(:), wind_refine(:)
 
     ! Storm object
     integer :: storm_type
-    real(kind=8) :: landfall = 0.d0
-    real(kind=8) :: ramp_width
+    real(CLAW_REAL) :: landfall = 0.d0
+    real(CLAW_REAL) :: ramp_width
     type(holland_storm_type), save :: holland_storm
     type(constant_storm_type), save :: constant_storm
     type(stommel_storm_type), save :: stommel_storm
 
     ! Wind drag maximum limit
-    real(kind=8), parameter :: WIND_DRAG_LIMIT = 2.d-3
+    real(CLAW_REAL), parameter :: WIND_DRAG_LIMIT = 2.d-3
 
     ! Display times in days relative to landfall
     logical :: display_landfall_time = .false.
@@ -126,7 +126,11 @@ contains
             read(unit,'(a)') line
             if (line(1:1) == "F") then
                 allocate(wind_refine(1))
+#if (CLAW_REAL == 8)
                 wind_refine(1) = huge(1.d0)
+#else
+                wind_refine(1) = huge(1.0)
+#endif
             else
                 allocate(wind_refine(get_value_count(line)))
                 read(line,*) (wind_refine(i),i=1,size(wind_refine,1))
@@ -134,7 +138,11 @@ contains
             read(unit,'(a)') line
             if (line(1:1) == "F") then
                 allocate(R_refine(1))
+#if (CLAW_REAL == 8)
                 R_refine(1) = -huge(1.d0)
+#else
+                R_refine(1) = -huge(1.0)
+#endif
             else
                 allocate(R_refine(get_value_count(line)))
                 read(line,*) (R_refine(i),i=1,size(R_refine,1))
@@ -190,7 +198,7 @@ contains
     end subroutine set_storm
 
     ! ========================================================================
-    !   real(kind=8) function *_wind_drag(wind_speed)
+    !   real(CLAW_REAL) function *_wind_drag(wind_speed)
     ! ========================================================================
     !  Calculates the drag coefficient for wind given the given wind speed.
     !  
@@ -209,16 +217,16 @@ contains
     !      Atmospheric Administration (NOAA) Joint Hurricane Testbed (JHT) 
     !      Program.” 26 pp.
     !
-    real(kind=8) pure function powell_wind_drag(wind_speed, theta)      &
+    real(CLAW_REAL) pure function powell_wind_drag(wind_speed, theta)      &
                                          result(wind_drag)
     
         implicit none
         
         ! Input
-        real(kind=8), intent(in) :: wind_speed, theta
+        real(CLAW_REAL), intent(in) :: wind_speed, theta
 
         ! Locals
-        real(kind=8) :: weight, left_drag, right_drag, rear_drag, drag(2)
+        real(CLAW_REAL) :: weight, left_drag, right_drag, rear_drag, drag(2)
 
         ! Calculate sector drags
         if (wind_speed <= 15.708d0) then
@@ -292,12 +300,12 @@ contains
     !  Garret Based Wind Drag
     ! ========================
     !  This version is a simple limited version of the wind drag
-    real(kind=8) pure function garret_wind_drag(wind_speed, theta) result(wind_drag)
+    real(CLAW_REAL) pure function garret_wind_drag(wind_speed, theta) result(wind_drag)
     
         implicit none
         
         ! Input
-        real(kind=8), intent(in) :: wind_speed, theta
+        real(CLAW_REAL), intent(in) :: wind_speed, theta
   
         wind_drag = min(WIND_DRAG_LIMIT, (0.75d0 + 0.067d0 * wind_speed) * 1d-3)      
     
@@ -307,9 +315,9 @@ contains
     ! ==================================================================
     !  No Wind Drag - Dummy function used to turn off wind drag forcing
     ! ==================================================================
-    real(kind=8) pure function no_wind_drag(wind_speed, theta) result(wind_drag)
+    real(CLAW_REAL) pure function no_wind_drag(wind_speed, theta) result(wind_drag)
         implicit none
-        real(kind=8), intent(in) :: wind_speed, theta
+        real(CLAW_REAL), intent(in) :: wind_speed, theta
         wind_drag = 0.d0
     end function no_wind_drag
 
@@ -327,10 +335,10 @@ contains
         implicit none
 
         ! Input
-        real(kind=8), intent(in) :: t
+        real(CLAW_REAL), intent(in) :: t
 
         ! Output
-        real(kind=8) :: location(2)
+        real(CLAW_REAL) :: location(2)
 
         select case(storm_type)
             case(0)
@@ -345,7 +353,7 @@ contains
 
     end function storm_location
 
-    real(kind=8) function storm_direction(t) result(theta)
+    real(CLAW_REAL) function storm_direction(t) result(theta)
         
         use amr_module, only: rinfinity
         use holland_storm_module, only: holland_storm_direction
@@ -354,7 +362,7 @@ contains
         implicit none
 
         ! Input
-        real(kind=8), intent(in) :: t
+        real(CLAW_REAL), intent(in) :: t
 
         select case(storm_type)
             case(0)
@@ -381,8 +389,8 @@ contains
 
         ! Input arguments
         integer, intent(in) :: maux, mbc, mx, my
-        real(kind=8), intent(in) :: xlower, ylower, dx, dy, t
-        real(kind=8), intent(in out) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+        real(CLAW_REAL), intent(in) :: xlower, ylower, dx, dy, t
+        real(CLAW_REAL), intent(in out) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
         select case(storm_type)
             case(0)
@@ -407,7 +415,7 @@ contains
 
         implicit none
 
-        real(kind=8), intent(in) :: t
+        real(CLAW_REAL), intent(in) :: t
         
         ! We open this here so that the file flushes and writes to disk
         open(unit=track_unit,file="fort.track",action="write",position='append')

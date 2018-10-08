@@ -1,4 +1,4 @@
-real(kind=8) pure function get_max_speed(val,mitot,mjtot,nvar,aux,naux,nghost,hx,hy)
+real(CLAW_REAL) pure function get_max_speed(val,mitot,mjtot,nvar,aux,naux,nghost,hx,hy)
 
     use geoclaw_module, only: dry_tolerance, coordinate_system
     use geoclaw_module, only: grav, earth_radius, DEG2RAD
@@ -7,12 +7,12 @@ real(kind=8) pure function get_max_speed(val,mitot,mjtot,nvar,aux,naux,nghost,hx
     
     ! Arguments
     integer, intent(in) :: mitot,mjtot,nvar,naux,nghost
-    real(kind=8), intent(in) :: hx,hy
-    real(kind=8), intent(in) :: val(nvar,mitot,mjtot), aux(naux,mitot,mjtot)
+    real(CLAW_REAL), intent(in) :: hx,hy
+    real(CLAW_REAL), intent(in) :: val(nvar,mitot,mjtot), aux(naux,mitot,mjtot)
     
     ! Locals
     integer :: i,j
-    real(kind=8) :: ymetric,hyphys,xmetric,hxphys,u,v,sig,sp_over_h
+    real(CLAW_REAL) :: ymetric,hyphys,xmetric,hxphys,u,v,sig,sp_over_h
 
 
     sp_over_h = 0.d0   ! compute max speed over h, since dx may not equal dy

@@ -42,23 +42,23 @@ subroutine flag2refine(mx,my,mbc,meqn,maux,xlower,ylower,dx,dy,t,level,tolsp, &
     
     ! Subroutine arguments
     integer, intent(in) :: mx,my,mbc,meqn,maux,level
-    real(kind=8), intent(in) :: xlower,ylower,dx,dy,t,tolsp
+    real(CLAW_REAL), intent(in) :: xlower,ylower,dx,dy,t,tolsp
     
-    real(kind=8), intent(in) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-    real(kind=8), intent(in) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
     
     ! Flagging
-    real(kind=8),intent(inout) :: amrflags(1-mbc:mx+mbc,1-mbc:my+mbc)
-    real(kind=8), intent(in) :: DONTFLAG
-    real(kind=8), intent(in) :: DOFLAG
+    real(CLAW_REAL),intent(inout) :: amrflags(1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: DONTFLAG
+    real(CLAW_REAL), intent(in) :: DOFLAG
     
     logical :: allowflag
     external allowflag
     
     ! Generic locals
     integer :: i,j,m,k,layer_index
-    real(kind=8) :: x_c,y_c,x_low,y_low,x_hi,y_hi
-    real(kind=8) :: h(num_layers), total_depth, speed, eta, eta_below, ds
+    real(CLAW_REAL) :: x_c,y_c,x_low,y_low,x_hi,y_hi
+    real(CLAW_REAL) :: h(num_layers), total_depth, speed, eta, eta_below, ds
 
     ! Initialize flags
     amrflags = DONTFLAG

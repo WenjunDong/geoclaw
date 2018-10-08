@@ -18,28 +18,28 @@ subroutine src2(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt)
     
     ! Input parameters
     integer, intent(in) :: meqn,mbc,mx,my,maux
-    double precision, intent(in) :: xlower,ylower,dx,dy,t,dt
+    real(CLAW_REAL), intent(in) :: xlower,ylower,dx,dy,t,dt
     
     ! Output
-    double precision, intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-    double precision, intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
     ! Locals
     integer :: i, j, nman
-    real(kind=8) :: h, hu, hv, gamma, dgamma, y, fdt, a(2,2), coeff
-    real(kind=8) :: xm, xc, xp, ym, yc, yp, dx_meters, dy_meters
-    real(kind=8) :: u, v, hu0, hv0
-    real(kind=8) :: tau, wind_speed, theta, phi, psi, P_gradient(2), S(2)
-    real(kind=8) :: Ddt, sloc(2)
+    real(CLAW_REAL) :: h, hu, hv, gamma, dgamma, y, fdt, a(2,2), coeff
+    real(CLAW_REAL) :: xm, xc, xp, ym, yc, yp, dx_meters, dy_meters
+    real(CLAW_REAL) :: u, v, hu0, hv0
+    real(CLAW_REAL) :: tau, wind_speed, theta, phi, psi, P_gradient(2), S(2)
+    real(CLAW_REAL) :: Ddt, sloc(2)
 
     ! Algorithm parameters
     ! Parameter controls when to zero out the momentum at a depth in the
     ! friction source term
-    real(kind=8), parameter :: depth_tolerance = 1.0d-30
+    real(CLAW_REAL), parameter :: depth_tolerance = 1.0d-30
 
     ! Physics
     ! Nominal density of water
-    real(kind=8), parameter :: rho = 1025.d0
+    real(CLAW_REAL), parameter :: rho = 1025.d0
 
     ! Friction source term
     if (friction_forcing) then

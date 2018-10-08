@@ -11,9 +11,9 @@ module refinement_module
     ! ========================================================================
     !  Refinement Criteria
     ! ========================================================================
-    real(kind=8) :: wave_tolerance
-    real(kind=8), allocatable :: speed_tolerance(:)
-    real(kind=8) :: deep_depth
+    real(CLAW_REAL) :: wave_tolerance
+    real(CLAW_REAL), allocatable :: speed_tolerance(:)
+    real(CLAW_REAL) :: deep_depth
     integer :: max_level_deep
     logical :: varRefTime = .FALSE. ! Choose dt refinement automatically
     
@@ -21,7 +21,7 @@ module refinement_module
     !  Flowgrades - Not updated yet, use at your own risk
     ! ========================================================================
     integer :: num_flowgrades
-    real(kind=8), allocatable :: flowgradevalue(:)
+    real(CLAW_REAL), allocatable :: flowgradevalue(:)
     integer, allocatable :: iflowgradevariable(:), iflowgradetype(:)
     integer, allocatable :: iflowgrademinlevel(:)
 

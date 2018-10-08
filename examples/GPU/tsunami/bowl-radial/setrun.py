@@ -160,7 +160,7 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.dt_initial = 0.016
 
     # Max time step to be allowed if variable dt used:
-    clawdata.dt_max = 1e+99
+    clawdata.dt_max = 1e+19
 
     # Desired Courant number if variable dt used, and max to allow without
     # retaking step with a smaller dt:

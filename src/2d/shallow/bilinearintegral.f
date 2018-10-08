@@ -6,12 +6,12 @@ c======================================================================
       implicit none
 
 *     !i/o
-      double precision xim,xip,yjm,yjp,x1,x2,y1,y2,dxx,dyy,
+      real(CLAW_REAL) xim,xip,yjm,yjp,x1,x2,y1,y2,dxx,dyy,
      &                                                z11,z12,z21,z22
-      double precision bilinearintegral
+      real(CLAW_REAL) bilinearintegral
 
 *     !local
-      double precision xlow,ylow,xhi,yhi,area,sumxi,sumeta,a,b,c,d
+      real(CLAW_REAL) xlow,ylow,xhi,yhi,area,sumxi,sumeta,a,b,c,d
 
 c#######################################################################
 c
@@ -64,14 +64,14 @@ c======================================================================
       implicit none
 
 *     !i/o
-      double precision xim,xip,yjm,yjp,x1,x2,y1,y2,dxx,dyy,
+      real(CLAW_REAL) xim,xip,yjm,yjp,x1,x2,y1,y2,dxx,dyy,
      &                                 z11,z12,z21,z22
-      double precision bilinearintegral_s
+      real(CLAW_REAL) bilinearintegral_s
 
 *     !local
-      double precision xlo,ylo,xhi,yhi,delx,dely,a,b,c,d
-      double precision xdiffhi,xdifflo,ydiffhi,ydifflo,xdiff2
-      double precision adsinint,cbsinint
+      real(CLAW_REAL) xlo,ylo,xhi,yhi,delx,dely,a,b,c,d
+      real(CLAW_REAL) xdiffhi,xdifflo,ydiffhi,ydifflo,xdiff2
+      real(CLAW_REAL) adsinint,cbsinint
 
 c#######################################################################
 c

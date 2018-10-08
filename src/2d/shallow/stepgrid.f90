@@ -29,7 +29,7 @@
       use geoclaw_module
       use amr_module
       use fixedgrids_module
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
 
       external rpn2,rpt2
 

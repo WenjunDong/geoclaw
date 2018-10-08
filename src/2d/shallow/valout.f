@@ -9,7 +9,7 @@ c
       use profiling_module
 #endif
 
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
       character*10  fname1, fname2, fname3, fname4, fname5
 
 c     # GeoClaw specific output....  add eta to q array before printing
@@ -21,8 +21,8 @@ c     # set outaux = .true. to also output the aux arrays to fort.a<iframe>
 
       logical outaux
       integer output_aux_num 
-      real(kind=8) :: h, hu, hv, eta
-      real(kind=8), allocatable :: qeta(:)
+      real(CLAW_REAL) :: h, hu, hv, eta
+      real(CLAW_REAL), allocatable :: qeta(:)
 
       integer :: clock_start, clock_finish, clock_rate
 

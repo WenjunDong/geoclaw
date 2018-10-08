@@ -17,13 +17,13 @@ subroutine topo_update(t)
    implicit none
 
    !arguments
-   real(kind=8), intent(in) ::t
+   real(CLAW_REAL), intent(in) ::t
 
    !locals
    integer :: i,j,m,mt
    integer :: ij,ij0,irank,idtopo1,idtopo2,jdtopo1,jdtopo2
    integer :: ijll,ijlr,ijul,ijur
-   real(kind=8) :: x,y,xl,xr,yu,yl,zll,zlr,zul,zur,dz12,dz1,dz2,dztotal
+   real(CLAW_REAL) :: x,y,xl,xr,yu,yl,zll,zlr,zul,zur,dz12,dz1,dz2,dztotal
 
    if (t<minval(t0dtopo).or.topo_finalized.eqv..true.) then
       return
@@ -55,8 +55,8 @@ subroutine topo_update(t)
           kdtopo2(m) = min(kdtopo2(m),mtdtopo(m))
           kdtopo1(m) = max(kdtopo1(m),1)
           kdtopo2(m) = max(kdtopo2(m),1)
-          tdtopo1(m) = t0dtopo(m)+ dtdtopo(m)*real(kdtopo1(m)-1,kind=8) ! <= t
-          tdtopo2(m) = t0dtopo(m)+ dtdtopo(m)*real(kdtopo2(m)-1,kind=8) ! >= t
+          tdtopo1(m) = t0dtopo(m)+ dtdtopo(m)*real(kdtopo1(m)-1,kind=CLAW_REAL) ! <= t
+          tdtopo2(m) = t0dtopo(m)+ dtdtopo(m)*real(kdtopo2(m)-1,kind=CLAW_REAL) ! >= t
           taudtopo(m) = 1.d0-max(0.d0,((t-tdtopo1(m))/dtdtopo(m)))
           taudtopo(m) = max(taudtopo(m),0.d0)
         endif
@@ -98,11 +98,11 @@ subroutine topo_update(t)
       endif
 
       do j=1,mytopo(mt)
-         y = yhitopo(mt) - real(j-1,kind=8)*dytopo(mt)
+         y = yhitopo(mt) - real(j-1,kind=CLAW_REAL)*dytopo(mt)
          do i=1,mxtopo(mt)
             ij = i0topo(mt) + (j-1)*mxtopo(mt) + i -1
             ij0 = i0topo0(mt) + (j-1)*mxtopo(mt) + i -1
-            x = xlowtopo(mt) +  real(i-1,kind=8)*dxtopo(mt)
+            x = xlowtopo(mt) +  real(i-1,kind=CLAW_REAL)*dxtopo(mt)
             dztotal = 0.0
             do irank = 1,num_dtopo
                m = mdtopoorder(irank)
@@ -145,9 +145,9 @@ subroutine topo_update(t)
                zlr = dtopowork(ijlr)
                zul = dtopowork(ijul)
                zur = dtopowork(ijur)
-               xl = xlowdtopo(m) + real(idtopo1-1,kind=8)*dxdtopo(m)
+               xl = xlowdtopo(m) + real(idtopo1-1,kind=CLAW_REAL)*dxdtopo(m)
                xr = xl + dxdtopo(m)
-               yu = yhidtopo(m) - real(jdtopo1-1,kind=8)*dydtopo(m)
+               yu = yhidtopo(m) - real(jdtopo1-1,kind=CLAW_REAL)*dydtopo(m)
                yl = yu - dydtopo(m)
 
                !bilinear value at (x,y) of dtopo cell at t=tdtopo1

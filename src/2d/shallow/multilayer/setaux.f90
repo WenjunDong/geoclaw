@@ -29,12 +29,12 @@ subroutine setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
     
     ! Arguments
     integer, intent(in) :: mbc,mx,my,maux
-    real(kind=8), intent(in) :: xlow,ylow,dx,dy
-    real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: xlow,ylow,dx,dy
+    real(CLAW_REAL), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
     
     ! Locals
     integer :: i,j,m,iint,jint
-    real(kind=8) :: x,y,xm,ym,xp,yp,topo_integral
+    real(CLAW_REAL) :: x,y,xm,ym,xp,yp,topo_integral
     character(len=*), parameter :: aux_format = "(2i4,4d15.3)"
 
     ! Lat-Long coordinate system in use, check input variables
@@ -73,11 +73,11 @@ subroutine setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
     do j=1-mbc,my+mbc
         ym = ylow + (j - 1.d0) * dy
         y = ylow + (j - 0.5d0) * dy
-        yp = ylow + real(j,kind=8) * dy
+        yp = ylow + real(j,kind=CLAW_REAL) * dy
         do i=1-mbc,mx+mbc
             xm = xlow + (i - 1.d0) * dx
             x = xlow + (i - 0.5d0) * dx
-            xp = xlow + real(i,kind=8) * dx
+            xp = xlow + real(i,kind=CLAW_REAL) * dx
 
             ! Set lat-long cell info
             if (coordinate_system == 2) then

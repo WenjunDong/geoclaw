@@ -11,23 +11,23 @@ subroutine fgmax_interpolate(mx,my,meqn,mbc,maux,q,aux,dx,dy, &
 
     implicit none
     integer, intent(in) :: mx,my,meqn,mbc,maux,ifg,level,fg_npts
-    real(kind=8), intent(in) :: q(meqn, 1-mbc:mx+mbc, 1-mbc:my+mbc)
-    real(kind=8), intent(in) :: aux(maux, 1-mbc:mx+mbc, 1-mbc:my+mbc)
-    real(kind=8), intent(in) :: dx,dy,xlower,ylower
-    !real(kind=8), dimension(:,:), allocatable, intent(inout) :: fg_values
+    real(CLAW_REAL), intent(in) :: q(meqn, 1-mbc:mx+mbc, 1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: aux(maux, 1-mbc:mx+mbc, 1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: dx,dy,xlower,ylower
+    !real(CLAW_REAL), dimension(:,:), allocatable, intent(inout) :: fg_values
     !logical, dimension(:), allocatable, intent(inout) :: mask_fgrid
-    real(kind=8), intent(inout) :: fg_values(FG_NUM_VAL,fg_npts)
+    real(CLAW_REAL), intent(inout) :: fg_values(FG_NUM_VAL,fg_npts)
     logical, intent(inout) :: mask_fgrid(fg_npts)
 
     type(fgrid), pointer :: fg
     integer :: i,j,k,mv,ma
     integer :: i1,i2,j1,j2
     logical, allocatable, dimension(:,:) :: mask_patch
-    real(kind=8), allocatable, dimension(:,:,:) :: values
-    real(kind=8), allocatable, dimension(:,:) :: a,b,c
-    real(kind=8), allocatable, dimension(:) :: dxk, dyk
+    real(CLAW_REAL), allocatable, dimension(:,:,:) :: values
+    real(CLAW_REAL), allocatable, dimension(:,:) :: a,b,c
+    real(CLAW_REAL), allocatable, dimension(:) :: dxk, dyk
     integer, allocatable, dimension(:) :: ik, jk
-    real(kind=8) :: x1,x2,y1,y2,x,y,xupper,yupper
+    real(CLAW_REAL) :: x1,x2,y1,y2,x,y,xupper,yupper
     logical :: debug
 
     debug = FG_DEBUG

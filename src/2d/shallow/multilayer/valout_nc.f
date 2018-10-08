@@ -26,11 +26,11 @@ c
 c
       use amr_module
       use netcdf      ! does this work????
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
       character*10  matname1, matname2
 
 c     include 'netcdf.inc'
-      real(kind=8) time
+      real(CLAW_REAL) time
       integer ncid,rcode
       integer timeid,tVarID,meqnID,ngridsVarID,nauxVarID,ndimVarID
       integer dimxid,dimyid,xlowid,ylowid,dxid,dyid

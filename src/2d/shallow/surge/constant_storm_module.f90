@@ -12,12 +12,12 @@ module constant_storm_module
     ! Holland storm type definition
     type constant_storm_type
 
-        real(kind=8) :: ramp_up_time
-        real(kind=8) :: velocity(2)
-        real(kind=8) :: R_eye_init(2)
-        real(kind=8) :: A
-        real(kind=8) :: B
-        real(kind=8) :: central_pressure
+        real(CLAW_REAL) :: ramp_up_time
+        real(CLAW_REAL) :: velocity(2)
+        real(CLAW_REAL) :: R_eye_init(2)
+        real(CLAW_REAL) :: A
+        real(CLAW_REAL) :: B
+        real(CLAW_REAL) :: central_pressure
 
     end type constant_storm_type
 
@@ -86,11 +86,11 @@ contains
         implicit none
 
         ! Input
-        real(kind=8), intent(in) :: t
+        real(CLAW_REAL), intent(in) :: t
         type(constant_storm_type), intent(in out) :: storm
 
         ! Output
-        real(kind=8) :: location(2)
+        real(CLAW_REAL) :: location(2)
 
         location = t * storm%velocity + storm%R_eye_init
 
@@ -100,16 +100,16 @@ contains
     !  storm_direction(t,storm)
     !    Interpolate location of hurricane in the current time interval
     ! ==========================================================================
-    real(kind=8) function constant_storm_direction(t,storm) result(theta)
+    real(CLAW_REAL) function constant_storm_direction(t,storm) result(theta)
 
         implicit none
 
         ! Input
-        real(kind=8), intent(in) :: t
+        real(CLAW_REAL), intent(in) :: t
         type(constant_storm_type), intent(in out) :: storm
 
         ! Locals
-        real(kind=8) :: junk(2)
+        real(CLAW_REAL) :: junk(2)
         theta = atan2(storm%velocity(2),storm%velocity(1))
 
     end function constant_storm_direction
@@ -127,7 +127,7 @@ contains
 
         ! Time of the wind field requested
         integer, intent(in) :: maux,mbc,mx,my
-        real(kind=8), intent(in) :: xlower,ylower,dx,dy,t
+        real(CLAW_REAL), intent(in) :: xlower,ylower,dx,dy,t
 
         ! Storm description, need in out here since we may update the storm
         ! if at next time point
@@ -135,11 +135,11 @@ contains
 
         ! Array storing wind and presure field
         integer, intent(in) :: wind_index, pressure_index
-        real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+        real(CLAW_REAL), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
         ! Locals
         integer :: i, j
-        real(kind=8) :: x, y, r, r_km, R_eye(2), f, C, w
+        real(CLAW_REAL) :: x, y, r, r_km, R_eye(2), f, C, w
 
         ! Hurrican eye location
         R_eye = constant_storm_location(t,storm)

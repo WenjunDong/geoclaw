@@ -20,14 +20,14 @@ c
 #endif
 
 
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
 
       logical vtime,dumpout/.false./,dumpchk/.false./,rest,dump_final
       dimension dtnew(maxlv), ntogo(maxlv), tlevel(maxlv)
       integer clock_start, clock_finish, clock_rate
       integer tick_clock_start, tick_clock_finish, tick_clock_rate
       character(len=128) :: time_format
-      real(kind=8) cpu_start,cpu_finish
+      real(CLAW_REAL) cpu_start,cpu_finish
 
 c
 c :::::::::::::::::::::::::::: TICK :::::::::::::::::::::::::::::
@@ -302,7 +302,7 @@ c
 c done with a level of integration. update counts, decide who next.
 c
           ntogo(level)  = ntogo(level) - 1
-          dtnew(level)  = dmin1(dtnew(level),dtlevnew)
+          dtnew(level)  = min(dtnew(level),dtlevnew)
           tlevel(level) = tlevel(level) + possk(level)
           icheck(level) = icheck(level) + 1
 c
@@ -330,6 +330,7 @@ c                same level goes again. check for ok time step
  601                format(" ***adjusting timestep for level ", i3,
      &                     " at t = ",d16.6)
                     print *,"    old ntogo dt",ntogo(level),possk(level)
+                    print *,"    dtnew(level)",dtnew(level)
 
 c                   adjust time steps for this and finer levels
                     ntogo(level) = ntogo(level) + 1

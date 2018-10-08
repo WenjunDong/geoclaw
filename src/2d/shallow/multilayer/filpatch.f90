@@ -25,11 +25,11 @@ recursive subroutine filrecur(level,num_eqn,valbig,aux,num_aux,t,mx,my, &
     ! Input
     integer, intent(in) :: level, num_eqn, num_aux, mx, my, nrowst, ncolst
     integer, intent(in) :: fill_indices(4)
-    real(kind=8), intent(in) :: t
+    real(CLAW_REAL), intent(in) :: t
 
     ! Output
-    real(kind=8), intent(in out) :: valbig(num_eqn,mx,my)
-    real(kind=8), intent(in out) :: aux(num_aux,mx,my)
+    real(CLAW_REAL), intent(in out) :: valbig(num_eqn,mx,my)
+    real(CLAW_REAL), intent(in out) :: aux(num_aux,mx,my)
 
     ! Local storage
     ! Flagging of set cells
@@ -38,11 +38,11 @@ recursive subroutine filrecur(level,num_eqn,valbig,aux,num_aux,t,mx,my, &
     integer :: mx_coarse, my_coarse, mx_patch, my_patch
     integer :: unset_indices(4), coarse_indices(4)
     integer :: refinement_ratio_x, refinement_ratio_y
-    real(kind=8) :: dx_fine, dy_fine, dx_coarse, dy_coarse
-    real(kind=8) :: coarse_rect(4), fill_rect(4)
-    real(kind=8) :: h, b, eta_fine, eta1, eta2, up_slope, down_slope
-    real(kind=8) :: hv_fine, v_fine, v_new, divide_mass
-    real(kind=8) :: h_fine_average, h_fine, h_count, h_coarse
+    real(CLAW_REAL) :: dx_fine, dy_fine, dx_coarse, dy_coarse
+    real(CLAW_REAL) :: coarse_rect(4), fill_rect(4)
+    real(CLAW_REAL) :: h, b, eta_fine, eta1, eta2, up_slope, down_slope
+    real(CLAW_REAL) :: hv_fine, v_fine, v_new, divide_mass
+    real(CLAW_REAL) :: h_fine_average, h_fine, h_count, h_coarse
     integer(kind=1) :: flaguse(fill_indices(2)-fill_indices(1)+1,fill_indices(4)-fill_indices(3)+1)
     
     ! Scratch arrays for interpolation
@@ -50,11 +50,11 @@ recursive subroutine filrecur(level,num_eqn,valbig,aux,num_aux,t,mx,my, &
 
     logical :: reloop
     
-    real(kind=8) :: fine_mass(fill_indices(2) - fill_indices(1) + 2, fill_indices(4) - fill_indices(3) + 2)
-    real(kind=8) :: eta_coarse(fill_indices(2) - fill_indices(1) + 2, fill_indices(4) - fill_indices(3) + 2)
-    real(kind=8) :: vel_max(fill_indices(2) - fill_indices(1) + 2, fill_indices(4) - fill_indices(3) + 2)
-    real(kind=8) :: vel_min(fill_indices(2) - fill_indices(1) + 2, fill_indices(4) - fill_indices(3) + 2)
-    real(kind=8) :: slope(2, fill_indices(2) - fill_indices(1) + 2, fill_indices(4) - fill_indices(3) + 2)
+    real(CLAW_REAL) :: fine_mass(fill_indices(2) - fill_indices(1) + 2, fill_indices(4) - fill_indices(3) + 2)
+    real(CLAW_REAL) :: eta_coarse(fill_indices(2) - fill_indices(1) + 2, fill_indices(4) - fill_indices(3) + 2)
+    real(CLAW_REAL) :: vel_max(fill_indices(2) - fill_indices(1) + 2, fill_indices(4) - fill_indices(3) + 2)
+    real(CLAW_REAL) :: vel_min(fill_indices(2) - fill_indices(1) + 2, fill_indices(4) - fill_indices(3) + 2)
+    real(CLAW_REAL) :: slope(2, fill_indices(2) - fill_indices(1) + 2, fill_indices(4) - fill_indices(3) + 2)
     integer :: fine_cell_count(fill_indices(2)-fill_indices(1)+2, fill_indices(4)-fill_indices(3)+2)
     integer :: nghost_patch
 
@@ -67,8 +67,8 @@ recursive subroutine filrecur(level,num_eqn,valbig,aux,num_aux,t,mx,my, &
     !  when pass it in to subroutines they treat it as having di_fineerent
     !  dimensions than the max size need to allocate here
     ! the +2 is to expand on coarse grid to enclose fine
-    real(kind=8) :: valcrse((fill_indices(2)-fill_indices(1)+2) * (fill_indices(4)-fill_indices(3)+2) * num_eqn)  
-    real(kind=8) :: auxcrse((fill_indices(2)-fill_indices(1)+2) * (fill_indices(4)-fill_indices(3)+2) * num_aux)  
+    real(CLAW_REAL) :: valcrse((fill_indices(2)-fill_indices(1)+2) * (fill_indices(4)-fill_indices(3)+2) * num_eqn)  
+    real(CLAW_REAL) :: auxcrse((fill_indices(2)-fill_indices(1)+2) * (fill_indices(4)-fill_indices(3)+2) * num_aux)  
 
     ! We begin by filling values for grids at level level.
     mx_patch = fill_indices(2) - fill_indices(1) + 1 ! nrowp
@@ -224,12 +224,12 @@ recursive subroutine filrecur(level,num_eqn,valbig,aux,num_aux,t,mx,my, &
         ! Loop through patch to be filled, includes multiple coarse cells
         do i_fine = 1, mx_patch
             i_coarse = 2 + (i_fine - (unset_indices(1) - fill_indices(1)) - 1) / refinement_ratio_x
-            eta1 = (-0.5d0 + real(mod(i_fine - 1, refinement_ratio_x),kind=8)) &
-                                / real(refinement_ratio_x,kind=8)
+            eta1 = (-0.5d0 + real(mod(i_fine - 1, refinement_ratio_x),kind=CLAW_REAL)) &
+                                / real(refinement_ratio_x,kind=CLAW_REAL)
             do j_fine = 1, my_patch
                 j_coarse = 2 + (j_fine - (unset_indices(3) - fill_indices(3)) - 1) / refinement_ratio_y
-                eta2 = (-0.5d0 + real(mod(j_fine - 1, refinement_ratio_y),kind=8)) &
-                                    / real(refinement_ratio_y,kind=8)
+                eta2 = (-0.5d0 + real(mod(j_fine - 1, refinement_ratio_y),kind=CLAW_REAL)) &
+                                    / real(refinement_ratio_y,kind=CLAW_REAL)
 
                 if (flaguse(i_fine,j_fine) == 0) then
                     ! Interpolate from coarse cells to fine grid for surface
@@ -316,10 +316,10 @@ recursive subroutine filrecur(level,num_eqn,valbig,aux,num_aux,t,mx,my, &
             ! Determine momentum in fine cells
             do i_fine = 1, mx_patch
                 i_coarse = 2 + (i_fine - (unset_indices(1) - fill_indices(1)) - 1) / refinement_ratio_x
-                eta1 = (-0.5d0 + real(mod(i_fine - 1, refinement_ratio_x),kind=8)) / real(refinement_ratio_x,kind=8)
+                eta1 = (-0.5d0 + real(mod(i_fine - 1, refinement_ratio_x),kind=CLAW_REAL)) / real(refinement_ratio_x,kind=CLAW_REAL)
                 do j_fine = 1, my_patch
                     j_coarse = 2 + (j_fine - (unset_indices(3) - fill_indices(3)) - 1) / refinement_ratio_y
-                    eta2 = (-0.5d0 + real(mod(j_fine - 1, refinement_ratio_y),kind=8)) / real(refinement_ratio_y,kind=8)
+                    eta2 = (-0.5d0 + real(mod(j_fine - 1, refinement_ratio_y),kind=CLAW_REAL)) / real(refinement_ratio_y,kind=CLAW_REAL)
 
                     if (flaguse(i_fine,j_fine) == 0) then
                         ! Cell not already set
@@ -348,17 +348,17 @@ recursive subroutine filrecur(level,num_eqn,valbig,aux,num_aux,t,mx,my, &
             if (reloop) then
                 do i_fine = 1,mx_patch
                     i_coarse = 2 + (i_fine - (unset_indices(1) - fill_indices(1)) - 1) / refinement_ratio_x
-                    eta1 = (-0.5d0 + real(mod(i_fine - 1, refinement_ratio_x),kind=8)) / real(refinement_ratio_x,kind=8)
+                    eta1 = (-0.5d0 + real(mod(i_fine - 1, refinement_ratio_x),kind=CLAW_REAL)) / real(refinement_ratio_x,kind=CLAW_REAL)
                     do j_fine  = 1,my_patch
                         j_coarse = 2 + (j_fine  - (unset_indices(3) - fill_indices(3)) - 1) / refinement_ratio_y
-                        eta2 = (-0.5d0 + real(mod(j_fine - 1, refinement_ratio_y),kind=8)) / real(refinement_ratio_y, kind=8)
+                        eta2 = (-0.5d0 + real(mod(j_fine - 1, refinement_ratio_y),kind=CLAW_REAL)) / real(refinement_ratio_y, kind=CLAW_REAL)
                         
                         if (flaguse(i_fine,j_fine) == 0) then
                             if (fine_flag(1,i_coarse,j_coarse) .or. fine_flag(n,i_coarse,j_coarse)) then
                                 if (fine_mass(i_coarse,j_coarse) > dry_tolerance(1)) then
 
                                     h_coarse = valcrse(ivalc(1,i_coarse,j_coarse)) / rho(1)
-                                    h_count = real(fine_cell_count(i_coarse,j_coarse),kind=8)
+                                    h_count = real(fine_cell_count(i_coarse,j_coarse),kind=CLAW_REAL)
                                     h_fine_average = fine_mass(i_coarse,j_coarse) / h_count
                                     divide_mass = max(h_coarse, h_fine_average)
                                     h_fine = valbig(1, i_fine + nrowst - 1, j_fine + ncolst - 1) / rho(1)

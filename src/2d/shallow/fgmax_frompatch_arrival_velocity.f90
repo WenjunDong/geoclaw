@@ -16,15 +16,15 @@ subroutine fgmax_frompatch(mx,my,meqn,mbc,maux,q,aux,dx,dy, &
 
     implicit none
     integer, intent(in) :: mx,my,meqn,mbc,maux,level
-    real(kind=8), intent(in) :: q(meqn, 1-mbc:mx+mbc, 1-mbc:my+mbc)
-    real(kind=8), intent(in) :: aux(maux, 1-mbc:mx+mbc, 1-mbc:my+mbc)
-    real(kind=8), intent(in) :: dx,dy,xlower,ylower,time,time_afterstep
+    real(CLAW_REAL), intent(in) :: q(meqn, 1-mbc:mx+mbc, 1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: aux(maux, 1-mbc:mx+mbc, 1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: dx,dy,xlower,ylower,time,time_afterstep
 
-    real(kind=8), allocatable, dimension(:,:) :: fg_values
+    real(CLAW_REAL), allocatable, dimension(:,:) :: fg_values
     logical, allocatable, dimension(:) :: mask_fgrid
     type(fgrid), pointer :: fg
     integer :: ifg,k,mv
-    real(kind=8) :: s
+    real(CLAW_REAL) :: s
 
     !print *, '+++ FG_DEBUG = ', FG_DEBUG
 

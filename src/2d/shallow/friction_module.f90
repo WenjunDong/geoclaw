@@ -31,11 +31,11 @@ module friction_module
     ! Support for region based specification
     type friction_region_type
         ! Bounds of region
-        real(kind=8) :: lower(2), upper(2)
+        real(CLAW_REAL) :: lower(2), upper(2)
 
         ! Coefficients in the region based on depths
-        real(kind=8), pointer :: depths(:)
-        real(kind=8), pointer :: manning_coefficients(:)
+        real(CLAW_REAL), pointer :: depths(:)
+        real(CLAW_REAL), pointer :: manning_coefficients(:)
 
     end type friction_region_type
     integer, private :: num_friction_regions = 0
@@ -45,13 +45,13 @@ module friction_module
     type friction_file_type
         ! Domain specification
         integer :: num_cells(2)
-        real(kind=8) :: lower(2), upper(2), dx(2)
+        real(CLAW_REAL) :: lower(2), upper(2), dx(2)
 
         ! Field information
-        real(kind=8) :: no_data_value
+        real(CLAW_REAL) :: no_data_value
 
         ! Array containing coefficients
-        real(kind=8), pointer :: data(:,:)
+        real(CLAW_REAL), pointer :: data(:,:)
     end type friction_file_type
 
     integer, private :: num_friction_files = 0
@@ -134,14 +134,14 @@ contains
 
         ! Input
         integer, intent(in) :: mx, my, num_ghost, num_aux
-        real(kind=8), intent(in) :: xlower, ylower, dx, dy
-        real(kind=8), intent(in out) :: aux(num_aux,                           &
+        real(CLAW_REAL), intent(in) :: xlower, ylower, dx, dy
+        real(CLAW_REAL), intent(in out) :: aux(num_aux,                           &
                                             1-num_ghost:mx+num_ghost,&
                                             1-num_ghost:my+num_ghost)
 
         ! Locals
         integer :: m,i,j,k
-        real(kind=8) :: x, y
+        real(CLAW_REAL) :: x, y
 
         if (variable_friction) then
             ! Set region based coefficients
@@ -192,7 +192,7 @@ contains
 
         ! Locals
         integer, parameter :: unit = 24
-!         real(kind=8), parameter :: missing_value = huge(1.d0)
+!         real(CLAW_REAL), parameter :: missing_value = huge(1.d0)
         integer :: ios, missing
         
         ! Open file for reading

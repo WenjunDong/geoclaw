@@ -23,8 +23,8 @@ c###########################################################################
 
       use geoclaw_module
 
-      implicit double precision (a-h,o-z)
-      double precision zz(1:mxx,1:myy)
+      implicit real(CLAW_REAL) (a-h,o-z)
+      real(CLAW_REAL) zz(1:mxx,1:myy)
 
 c     # initialize:
       theintegral = 0.d0

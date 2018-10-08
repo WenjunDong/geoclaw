@@ -12,7 +12,7 @@ c
       use memory_module, only: gpu_allocate, gpu_deallocate
       use cuda_module, only: device_id
 #endif
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
 
       dimension spoh(maxlv)
       integer omp_get_thread_num, omp_get_max_threads
@@ -244,7 +244,11 @@ c
          dtc = possk(level-1)
 C        Need this check in order to account for completely dry grids
          if (abs(spoh(level)) < tiny(1.d0)) then
+#if (CLAW_REAL == 8)
            dtf = huge(1.d0)
+#else
+           dtf = huge(1.0)
+#endif
          else
            dtf = cfl/(spoh(level))
          endif
@@ -272,7 +276,7 @@ c  so I didnt want to have to deal with it
        subroutine prepnewgrids(listnewgrids,num,level)
 
        use amr_module
-       implicit double precision (a-h,o-z)
+       implicit real(CLAW_REAL) (a-h,o-z)
        integer listnewgrids(num)
 
        mptr = newstl(level)

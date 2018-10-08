@@ -24,7 +24,7 @@ logical function allowflag(x,y,t,level)
     implicit none
 
     ! Function arguments
-    real(kind=8), intent(in) :: x,y,t
+    real(CLAW_REAL), intent(in) :: x,y,t
     integer, intent(in) :: level
 
     ! Locals

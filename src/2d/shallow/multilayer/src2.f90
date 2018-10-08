@@ -20,29 +20,29 @@ subroutine src2(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt)
     
     ! Input parameters
     integer, intent(in) :: meqn,mbc,mx,my,maux
-    real(kind=8), intent(in) :: xlower,ylower,dx,dy,t,dt
+    real(CLAW_REAL), intent(in) :: xlower,ylower,dx,dy,t,dt
     
     ! Output
-    real(kind=8), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
-    real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(inout) :: q(meqn,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
 
     ! Locals
     integer :: i, j, m, k, bottom_index, bottom_layer, layer_index
     logical :: found
-    real(kind=8) :: xm, xc, xp, ym, yc, yp, dx_meters, dy_meters
-    real(kind=8) :: h(num_layers), hu, hv, u, v, hu0, hv0
-    real(kind=8) :: tau, wind_speed, theta, phi, psi, P_gradient(2), S(2), sloc(2)
-    real(kind=8) :: fdt, Ddt, a(2,2)
+    real(CLAW_REAL) :: xm, xc, xp, ym, yc, yp, dx_meters, dy_meters
+    real(CLAW_REAL) :: h(num_layers), hu, hv, u, v, hu0, hv0
+    real(CLAW_REAL) :: tau, wind_speed, theta, phi, psi, P_gradient(2), S(2), sloc(2)
+    real(CLAW_REAL) :: fdt, Ddt, a(2,2)
 
     ! Physics parameters
-    real(kind=8), parameter :: fric_coefficient = 7.d0 / 3.d0
-    real(kind=8), parameter :: H_break = 2.d0
-    real(kind=8), parameter :: theta_f = 10.d0
-    real(kind=8), parameter :: gamma_f = 4.d0 / 3.d0
+    real(CLAW_REAL), parameter :: fric_coefficient = 7.d0 / 3.d0
+    real(CLAW_REAL), parameter :: H_break = 2.d0
+    real(CLAW_REAL), parameter :: theta_f = 10.d0
+    real(CLAW_REAL), parameter :: gamma_f = 4.d0 / 3.d0
 
     ! Algorithm parameters
     ! Here to prevent a divide by zero in friction term
-    real(kind=8), parameter :: friction_tolerance = 1.0d-30
+    real(CLAW_REAL), parameter :: friction_tolerance = 1.0d-30
 
     character(len=*), parameter :: CFL_FORMAT =   &
                         "('*** WARNING *** Courant number  =', d12.4," // &
@@ -52,7 +52,7 @@ subroutine src2(meqn,mbc,mx,my,xlower,ylower,dx,dy,q,maux,aux,t,dt)
     ! Algorithm parameters
     ! Parameter controls when to zero out the momentum at a depth in the
     ! friction source term
-    real(kind=8), parameter :: depth_tolerance = 1.0d-30
+    real(CLAW_REAL), parameter :: depth_tolerance = 1.0d-30
 
     ! wind -----------------------------------------------------------
     if (wind_forcing) then

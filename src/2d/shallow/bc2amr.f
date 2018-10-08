@@ -82,7 +82,7 @@ c ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::;
       use amr_module, only: xperdom,yperdom,spheredom
 
 
-      implicit double precision (a-h,o-z)
+      implicit real(CLAW_REAL) (a-h,o-z)
 
       dimension val(meqn,nrow,ncol), aux(naux,nrow,ncol)
 

@@ -31,12 +31,12 @@ subroutine setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
 
     ! Arguments
     integer, intent(in) :: mbc,mx,my,maux
-    real(kind=8), intent(in) :: xlow,ylow,dx,dy
-    real(kind=8), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
+    real(CLAW_REAL), intent(in) :: xlow,ylow,dx,dy
+    real(CLAW_REAL), intent(inout) :: aux(maux,1-mbc:mx+mbc,1-mbc:my+mbc)
     
     ! Locals
     integer :: ii,jj,m, iint,jint
-    real(kind=8) :: x,y,xm,ym,xp,yp,topo_integral
+    real(CLAW_REAL) :: x,y,xm,ym,xp,yp,topo_integral
     character(len=*), parameter :: aux_format = "(2i4,4d15.3)"
     integer :: skipcount,iaux,ilo,jlo
 
@@ -84,8 +84,13 @@ subroutine setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
     ! Set analytical bathymetry here if requested
     if (test_topography > 0) then
         forall (ii=1-mbc:mx+mbc,jj=1-mbc:my+mbc)
+#if (CLAW_REAL == 8)
             aux(1,ii,jj) = test_topo(xlow + (ii - 0.5d0) * dx,       &
                                      ylow + (jj - 0.5d0) * dy)
+#else
+            aux(1,ii,jj) = test_topo(xlow + (ii - 0.50) * dx,       &
+                                     ylow + (jj - 0.50) * dy)
+#endif
         end forall
     endif
 
@@ -99,7 +104,7 @@ subroutine setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
     do jj=1-mbc,my+mbc
         !ym = ylow + (jj - 1.d0) * dy
         !y = ylow + (jj - 0.5d0) * dy
-        !yp = ylow + real(jj,kind=8) * dy
+        !yp = ylow + real(jj,kind=CLAW_REAL) * dy
 
         ym = ylower + (jlo+jj-1.d0) * dy
         yp = ylower + (jlo+jj) * dy
@@ -109,7 +114,7 @@ subroutine setaux(mbc,mx,my,xlow,ylow,dx,dy,maux,aux)
         do ii=1-mbc,mx+mbc
             !xm = xlow + (ii - 1.d0) * dx
             !x  = xlow + (ii - 0.5d0) * dx
-            !xp = xlow + real(ii,kind=8) * dx
+            !xp = xlow + real(ii,kind=CLAW_REAL) * dx
 
             xm = xlower + (ilo+ii-1.d0) * dx
             xp = xlower + (ilo+ii) * dx
