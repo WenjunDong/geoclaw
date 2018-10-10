@@ -601,12 +601,16 @@ program amr2
     close(parmunit)
 
  
+    call take_cpu_timer("Total run time", timer_total_run_time)
+    call cpu_timer_start(timer_total_run_time)
 
     ! --------------------------------------------------------
     !  Tick is the main routine which drives the computation:
     ! --------------------------------------------------------
     call tick(nvar,cut,nstart,vtime,time,naux,t0,rest,dt_max)
     ! --------------------------------------------------------
+
+    call cpu_timer_stop(timer_total_run_time)
 
     ! Done with computation, cleanup:
 
