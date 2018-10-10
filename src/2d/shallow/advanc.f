@@ -6,6 +6,7 @@ c
       use amr_module
       use fixedgrids_module
       use topo_module, only: topo_finalized
+      use timer_module
 
       implicit double precision (a-h,o-z)
 
@@ -46,6 +47,8 @@ c get start time for more detailed timing by level
        call system_clock(clock_startBound,clock_rate)
        call cpu_time(cpu_startBound)
 
+       call take_cpu_timer("Filling ghost cells", timer_bound)
+       call cpu_timer_start(timer_bound)
 c     maxthreads initialized to 1 above in case no openmp
 !$    maxthreads = omp_get_max_threads()
 
@@ -72,6 +75,7 @@ c
 
         end do
 !$OMP END PARALLEL DO
+      call cpu_timer_stop(timer_bound)
       call system_clock(clock_finishBound,clock_rate)
       call cpu_time(cpu_finishBound)
       timeBound = timeBound + clock_finishBound - clock_startBound
@@ -79,11 +83,14 @@ c
 
 c
 c save coarse level values if there is a finer level for wave fixup
+      call take_cpu_timer('saveqc', timer_saveqc)
+      call cpu_timer_start(timer_saveqc)
       if (level+1 .le. mxnest) then
          if (lstart(level+1) .ne. null) then
             call saveqc(level+1,nvar,naux)
          endif
       endif
+      call cpu_timer_stop(timer_saveqc)
 c
       time = rnode(timemult,lstart(level))
 c      call fgrid_advance(time,delt)
