@@ -85,11 +85,11 @@ c
 c save coarse level values if there is a finer level for wave fixup
       call take_cpu_timer('saveqc', timer_saveqc)
       call cpu_timer_start(timer_saveqc)
-      if (level+1 .le. mxnest) then
-         if (lstart(level+1) .ne. null) then
-            call saveqc(level+1,nvar,naux)
-         endif
-      endif
+c     if (level+1 .le. mxnest) then
+c        if (lstart(level+1) .ne. null) then
+c           call saveqc(level+1,nvar,naux)
+c        endif
+c     endif
       call cpu_timer_stop(timer_saveqc)
 c
       time = rnode(timemult,lstart(level))
@@ -227,16 +227,16 @@ c
 
       locaux = node(storeaux,mptr)
 c
-      if (node(ffluxptr,mptr) .ne. 0) then
-         lenbc  = 2*(nx/intratx(level-1)+ny/intraty(level-1))
-         locsvf = node(ffluxptr,mptr)
-         locsvq = locsvf + nvar*lenbc
-         locx1d = locsvq + nvar*lenbc
-         call qad(alloc(locnew),mitot,mjtot,nvar,
-     1            alloc(locsvf),alloc(locsvq),lenbc,
-     2            intratx(level-1),intraty(level-1),hx,hy,
-     3            naux,alloc(locaux),alloc(locx1d),delt,mptr)
-      endif
+c     if (node(ffluxptr,mptr) .ne. 0) then
+c        lenbc  = 2*(nx/intratx(level-1)+ny/intraty(level-1))
+c        locsvf = node(ffluxptr,mptr)
+c        locsvq = locsvf + nvar*lenbc
+c        locx1d = locsvq + nvar*lenbc
+c        call qad(alloc(locnew),mitot,mjtot,nvar,
+c    1            alloc(locsvf),alloc(locsvq),lenbc,
+c    2            intratx(level-1),intraty(level-1),hx,hy,
+c    3            naux,alloc(locaux),alloc(locx1d),delt,mptr)
+c     endif
 
 c        # See if the grid about to be advanced has gauge data to output.
 c        # This corresponds to previous time step, but output done
@@ -272,18 +272,18 @@ c           # should never get here due to check in amr2
             stop
          endif
 
-      if (node(cfluxptr,mptr) .ne. 0)
-     2   call fluxsv(mptr,fm,fp,gm,gp,
-     3               alloc(node(cfluxptr,mptr)),mitot,mjtot,
-     4               nvar,listsp(level),delt,hx,hy)
-      if (node(ffluxptr,mptr) .ne. 0) then
-         lenbc = 2*(nx/intratx(level-1)+ny/intraty(level-1))
-         locsvf = node(ffluxptr,mptr)
-         call fluxad(fm,fp,gm,gp,
-     2               alloc(locsvf),mptr,mitot,mjtot,nvar,
-     4               lenbc,intratx(level-1),intraty(level-1),
-     5               nghost,delt,hx,hy)
-      endif
+c     if (node(cfluxptr,mptr) .ne. 0)
+c    2   call fluxsv(mptr,fm,fp,gm,gp,
+c    3               alloc(node(cfluxptr,mptr)),mitot,mjtot,
+c    4               nvar,listsp(level),delt,hx,hy)
+c     if (node(ffluxptr,mptr) .ne. 0) then
+c        lenbc = 2*(nx/intratx(level-1)+ny/intraty(level-1))
+c        locsvf = node(ffluxptr,mptr)
+c        call fluxad(fm,fp,gm,gp,
+c    2               alloc(locsvf),mptr,mitot,mjtot,nvar,
+c    4               lenbc,intratx(level-1),intraty(level-1),
+c    5               nghost,delt,hx,hy)
+c     endif
 c
 c        write(outunit,969) mythread,delt, dtnew
 c969     format(" thread ",i4," updated by ",e15.7, " new dt ",e15.7)

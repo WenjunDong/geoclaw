@@ -98,15 +98,15 @@ c            # Note capa is stored in aux(icrse,jcrse,mcapa)
 c        # If coarse cell is dry then don't include updates from fine
 c        # grid fluxes that might give unphysical wetting because coarse
 c        # cell may be much higher than some fine cells:
-         if (val(1,icrse,jcrse) > dry_tolerance) then
-           do 20 ivar = 1,nvar
-            val(ivar,icrse,jcrse) = val(ivar,icrse,jcrse) +
-     1      sgnm*alloc(kidlst+nvar*(lkid-1)+ivar-1)/area
- 20        continue
-         else
+c        if (val(1,icrse,jcrse) > dry_tolerance) then
+c          do 20 ivar = 1,nvar
+c           val(ivar,icrse,jcrse) = val(ivar,icrse,jcrse) +
+c    1      sgnm*alloc(kidlst+nvar*(lkid-1)+ivar-1)/area
+c20        continue
+c        else
 c          write(6,*) '+++ throw out ',alloc(kidlst+nvar*(lkid-1))
-           continue
-         endif
+c          continue
+c        endif
          
 c        # Reset small h to zeros once again:
          if (val(1,icrse,jcrse) < dry_tolerance) then
