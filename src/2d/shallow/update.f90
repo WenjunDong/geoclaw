@@ -73,8 +73,8 @@
          jhi     = node(ndjhi,mptr)
 
          if (node(cfluxptr,mptr) .eq. 0) go to 25
-         call upbnd(alloc(node(cfluxptr,mptr)),alloc(loc),nvar,naux,
-     1              mitot,mjtot,listsp(lget),mptr) ! took out next to last arg
+         call upbnd(alloc(node(cfluxptr,mptr)),alloc(loc),nvar,naux, &
+                    mitot,mjtot,listsp(lget),mptr) ! took out next to last arg
 !
 !  loop through all intersecting fine grids as source updaters.
 !
