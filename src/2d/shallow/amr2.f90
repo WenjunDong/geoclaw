@@ -771,6 +771,8 @@ program amr2
     write(timing_unit,*)
     close(timing_unit)
 
+    call print_all_cpu_timers()
+
     ! Done with computation, cleanup:
     lentotsave = lentot
     call cleanup(nvar,naux)

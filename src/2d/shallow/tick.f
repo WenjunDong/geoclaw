@@ -223,7 +223,10 @@ c
 
           call system_clock(clock_start,clock_rate)
           call cpu_time(cpu_start)
+          call take_cpu_timer("Regridding", timer_regridding)
+          call cpu_timer_start(timer_regridding)
           call regrid(nvar,lbase,cut,naux,start_time)
+          call cpu_timer_stop(timer_regridding)
           call system_clock(clock_finish,clock_rate)
           call cpu_time(cpu_finish)
           timeRegridding = timeRegridding + clock_finish - clock_start
