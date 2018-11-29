@@ -12,7 +12,6 @@ c
 
 
       logical vtime
-      integer omp_get_thread_num, omp_get_max_threads
       integer mythread/0/, maxthreads/1/
       integer listgrids(numgrids(level))
       integer clock_start, clock_finish, clock_rate
